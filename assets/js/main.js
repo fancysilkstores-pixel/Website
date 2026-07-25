@@ -138,19 +138,41 @@ initReveal();
 })();
 
 // ============================================
-// Reels — render from REEL_IMAGES (products.js)
+// Reels — render from REEL_IMAGES (products.js). Tapping a thumbnail plays
+// that exact reel's video (assets/reels/<shortcode>.mp4) in a lightbox,
+// instead of just linking out to the Instagram profile.
 // ============================================
+const REEL_VIDEO_SHORTCODES = new Set([
+  "Da7_QuDsfW2","DbA2bzPM1F8","DbBG-AHs48M","DbBV1-Ozpgt","DbBVj0sTad4",
+  "DbBVsrUTzN-","DbDy616TouN","DbGAlf2MvfB","DbGSTv-TVeq","DbGSjVKT26S",
+  "DbGSvh1z3j7","DbGUAUFziTL","DbGYoSYzSO1","DbGZI9ITqsX","DbGarQHzVoB",
+  "DbI--rtzU5s","DbI3jNtT8Tb","DbI_F59zopw","DbIpWhEs8pc","DbIvHzQMt7r",
+  "DbIzVtNpVzX","DbJK0qkT9oW","DbJK8KJzNqH","DbJKmv6zWRr","DbJLL9RTDc_",
+  "DbLKydbMq7h","DbLQo4zMGkR","DbLdr6IzC4t","DbLgguXzEh5","DbN0ZdNJidf",
+  "DbN1tHZsVl_","DbN78EBMEkE","DbNOc0jxWoa","DbOEUCPsTpm","DbOFYhksc0_",
+  "DbOKm0WTjbk","DbOLB2PTUJI",
+]);
+function reelShortCodeFromFile(file){
+  return file.replace(/\.(jpg|jpeg|png)$/i, '').replace(/_(mid|retry|alt)$/, '');
+}
+
 (function(){
   const row = document.querySelector('.reels-row');
   if(!row || typeof REEL_IMAGES === 'undefined') return;
   const VISIBLE_ON_MOBILE = 8;
-  row.innerHTML = REEL_IMAGES.map((file, i) => `
-    <a class="reel-card${i >= VISIBLE_ON_MOBILE ? ' reel-extra' : ''}" href="https://www.instagram.com/fancy_silk_store_nakodar" target="_blank" rel="noopener">
+  row.innerHTML = REEL_IMAGES.map((file, i) => {
+    const code = reelShortCodeFromFile(file);
+    const hasVideo = REEL_VIDEO_SHORTCODES.has(code);
+    const cls = `reel-card${i >= VISIBLE_ON_MOBILE ? ' reel-extra' : ''}`;
+    const inner = `
       <img src="/assets/images/${file}" alt="Fancy Silk Store Instagram reel" loading="lazy">
       <div class="reel-play"><svg viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg></div>
-      <span class="reel-label">Watch on Instagram</span>
-    </a>
-  `).join('');
+      <span class="reel-label">${hasVideo ? 'Watch' : 'Watch on Instagram'}</span>
+    `;
+    return hasVideo
+      ? `<button type="button" class="${cls}" data-reel-video="${code}">${inner}</button>`
+      : `<a class="${cls}" href="https://www.instagram.com/fancy_silk_store_nakodar" target="_blank" rel="noopener">${inner}</a>`;
+  }).join('');
   initReveal();
 
   if(REEL_IMAGES.length > VISIBLE_ON_MOBILE){
@@ -164,6 +186,37 @@ initReveal();
       initReveal();
       moreBtn.remove();
     });
+  }
+
+  const videoBox = document.getElementById('reel-video-lightbox');
+  const videoPlayer = videoBox ? videoBox.querySelector('.reel-video-player') : null;
+
+  function openReelVideo(code){
+    if(!videoBox || !videoPlayer) return;
+    videoPlayer.src = `/assets/reels/${code}.mp4`;
+    videoBox.classList.add('open');
+    document.body.classList.add('no-scroll');
+    videoPlayer.play().catch(() => { /* autoplay may be blocked — controls let them tap play */ });
+  }
+  function closeReelVideo(){
+    if(!videoBox || !videoPlayer) return;
+    videoBox.classList.remove('open');
+    document.body.classList.remove('no-scroll');
+    videoPlayer.pause();
+    videoPlayer.src = '';
+  }
+
+  row.addEventListener('click', e => {
+    const btn = e.target.closest('[data-reel-video]');
+    if(!btn) return;
+    e.preventDefault();
+    openReelVideo(btn.dataset.reelVideo);
+  });
+
+  if(videoBox){
+    videoBox.querySelector('.reel-video-close')?.addEventListener('click', closeReelVideo);
+    videoBox.querySelector('.reel-video-backdrop')?.addEventListener('click', closeReelVideo);
+    document.addEventListener('keydown', e => { if(e.key === 'Escape') closeReelVideo(); });
   }
 })();
 
