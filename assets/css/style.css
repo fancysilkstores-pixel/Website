@@ -107,6 +107,7 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
   color: var(--white);
 }
 .nav-cta{
+  display:flex; align-items:center; gap:8px;
   padding:10px 20px;
   border-radius: var(--radius-pill);
   background: var(--royal-blue);
@@ -391,11 +392,11 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
 .catalog-carousel{
   position:relative;
   display:flex; align-items:center; justify-content:center;
-  padding: 40px 0 20px;
+  padding: 60px 0 30px;
   perspective: 1400px;
 }
 .carousel-track{
-  position:relative; height: 460px; width:100%;
+  position:relative; height: 600px; width:100%;
   display:flex; align-items:center; justify-content:center;
 }
 .carousel-card{
@@ -445,7 +446,7 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
 .carousel-dots span{ width:8px; height:8px; border-radius:50%; background: var(--beige-dark); transition: all .3s; }
 .carousel-dots span.active{ width:22px; background: var(--royal-blue); }
 
-.catalog-filters{ display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-bottom:10px; }
+.catalog-filters{ display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-bottom:20px; }
 .filter-chip{
   padding:9px 18px; border-radius: var(--radius-pill);
   border:1.5px solid var(--beige-dark); font-weight:600; font-size:.85rem;
