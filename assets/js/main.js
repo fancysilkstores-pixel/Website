@@ -128,7 +128,7 @@ initReveal();
           <div class="cc-price">${money(p.price)}</div>
           <div class="cc-btn-row">
             <button type="button" class="cc-view-btn" data-view="${p.id}">View</button>
-            <a class="cc-order-btn" href="https://wa.me/918699161743?text=${msg}" target="_blank" rel="noopener">
+            <a class="cc-order-btn" href="https://wa.me/918699161743?text=${msg}" target="_blank" rel="noopener" data-order="${p.id}">
               <img src="/assets/images/whatsapp-logo.jpg" class="btn-icon round" alt="">Order This
             </a>
           </div>
@@ -148,7 +148,7 @@ initReveal();
           <div class="gc-price">${money(p.price)}</div>
           <div class="gc-btn-row">
             <button type="button" class="gc-view-btn" data-view="${p.id}">View</button>
-            <a class="gc-order-btn" href="https://wa.me/918699161743?text=${msg}" target="_blank" rel="noopener">
+            <a class="gc-order-btn" href="https://wa.me/918699161743?text=${msg}" target="_blank" rel="noopener" data-order="${p.id}">
               <img src="/assets/images/whatsapp-logo.jpg" class="btn-icon round" alt="">Order This
             </a>
           </div>
@@ -169,6 +169,7 @@ initReveal();
     box.querySelector('.pl-fabric').textContent = p.fabric;
     box.querySelector('.pl-price').textContent = money(p.price);
     box.querySelector('.pl-order-btn').href = `https://wa.me/918699161743?text=${msg}`;
+    box.querySelector('.pl-order-btn').dataset.order = p.id;
     box.classList.add('open');
     document.body.classList.add('no-scroll');
   }
@@ -193,6 +194,43 @@ initReveal();
     if(!viewBtn) return;
     e.preventDefault();
     openLightbox(viewBtn.dataset.view);
+  });
+
+  function showToast(text){
+    let toast = document.querySelector('.order-toast');
+    if(!toast){
+      toast = document.createElement('div');
+      toast.className = 'order-toast';
+      document.body.appendChild(toast);
+    }
+    toast.textContent = text;
+    toast.classList.add('show');
+    clearTimeout(toast._hideTimer);
+    toast._hideTimer = setTimeout(() => toast.classList.remove('show'), 3200);
+  }
+
+  function shareOrder(id, waUrl){
+    // Open WhatsApp immediately, synchronously within the click — awaiting the
+    // image fetch first causes browsers to treat window.open as a blocked popup
+    // since it no longer runs inside the original user-gesture stack.
+    const win = window.open(waUrl, '_blank', 'noopener');
+    if(!win) window.location.href = waUrl; // popup blocked — fall back to same-tab nav
+
+    const p = PRODUCTS.find(x => x.id === Number(id));
+    if(!p || !navigator.clipboard || !window.ClipboardItem) return;
+
+    fetch(`/assets/images/${p.image}`)
+      .then(resp => resp.blob())
+      .then(blob => navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]))
+      .then(() => showToast('Product image copied — paste it (long-press ▸ Paste, or Ctrl+V) into the WhatsApp chat that just opened.'))
+      .catch(() => { /* best effort only — clipboard access can be denied/unsupported */ });
+  }
+
+  document.addEventListener('click', e => {
+    const orderBtn = e.target.closest('[data-order]');
+    if(!orderBtn) return;
+    e.preventDefault();
+    shareOrder(orderBtn.dataset.order, orderBtn.href);
   });
 
   function renderFilters(){
@@ -285,5 +323,19 @@ initReveal();
   renderFilters();
   renderCards();
 
-  setInterval(() => goTo(active + 1), 4500);
+  let autoRotatePaused = false;
+  setInterval(() => { if(!autoRotatePaused) goTo(active + 1); }, 4500);
+
+  // View toggle — switch between the interactive carousel and the simple list
+  const toggleBtns = document.querySelectorAll('.view-toggle-btn');
+  const viewPanels = document.querySelectorAll('.catalog-view');
+  toggleBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const mode = btn.dataset.viewMode;
+      toggleBtns.forEach(b => b.classList.toggle('active', b === btn));
+      viewPanels.forEach(panel => { panel.hidden = panel.dataset.mode !== mode; });
+      autoRotatePaused = mode !== 'interactive';
+      initReveal();
+    });
+  });
 })();

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fancy-silk-store-v2';
+const CACHE_NAME = 'fancy-silk-store-v3';
 const CORE_ASSETS = [
   '/',
   '/index.html',

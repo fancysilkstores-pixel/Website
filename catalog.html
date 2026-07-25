@@ -25,7 +25,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/style.css?v=9">
+<link rel="stylesheet" href="/assets/css/style.css?v=11">
 
 <script type="application/ld+json">
 {
@@ -75,25 +75,29 @@
     <!-- filters rendered dynamically from PRODUCT_CATEGORIES in products.js -->
   </div>
 
-  <div class="catalog-carousel">
-    <div class="carousel-track">
-      <!-- cards rendered dynamically from PRODUCTS in products.js -->
+  <div class="view-toggle reveal">
+    <button type="button" class="view-toggle-btn active" data-view-mode="interactive">✨ Interactive View</button>
+    <button type="button" class="view-toggle-btn" data-view-mode="simple">☰ Simple View</button>
+  </div>
+
+  <div class="catalog-view" data-mode="interactive">
+    <div class="catalog-carousel">
+      <div class="carousel-track">
+        <!-- cards rendered dynamically from PRODUCTS in products.js -->
+      </div>
     </div>
+
+    <div class="carousel-nav">
+      <button class="carousel-prev" aria-label="Previous">‹</button>
+      <button class="carousel-next" aria-label="Next">›</button>
+    </div>
+    <div class="carousel-dots"></div>
   </div>
 
-  <div class="carousel-nav">
-    <button class="carousel-prev" aria-label="Previous">‹</button>
-    <button class="carousel-next" aria-label="Next">›</button>
-  </div>
-  <div class="carousel-dots"></div>
-
-  <div class="section-head reveal" style="margin-top:70px;">
-    <span class="section-eyebrow">Full Catalog</span>
-    <h2>Every piece, listed simply</h2>
-    <p>No swiping needed — browse the full list and tap View for a closer look.</p>
-  </div>
-  <div class="product-grid">
-    <!-- rendered dynamically from PRODUCTS in products.js -->
+  <div class="catalog-view" data-mode="simple" hidden>
+    <div class="product-grid">
+      <!-- rendered dynamically from PRODUCTS in products.js -->
+    </div>
   </div>
 
   <div class="reels-cta reveal" style="margin:50px 0 90px;">
@@ -161,6 +165,6 @@
 </footer>
 
 <script src="/assets/js/products.js?v=9"></script>
-<script src="/assets/js/main.js?v=9"></script>
+<script src="/assets/js/main.js?v=13"></script>
 </body>
 </html>

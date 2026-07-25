@@ -461,6 +461,15 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
 .carousel-dots span{ width:8px; height:8px; border-radius:50%; background: var(--beige-dark); transition: all .3s; }
 .carousel-dots span.active{ width:22px; background: var(--royal-blue); }
 
+.view-toggle{ display:flex; justify-content:center; gap:10px; margin-bottom:26px; }
+.view-toggle-btn{
+  padding:11px 22px; border-radius: var(--radius-pill);
+  border:1.5px solid var(--beige-dark); font-weight:700; font-size:.85rem;
+  color:var(--ink); background: var(--white); transition: all .2s;
+}
+.view-toggle-btn.active{ background: var(--royal-blue); border-color:var(--royal-blue); color:#fff; }
+.view-toggle-btn:not(.active):hover{ border-color: var(--royal-blue); }
+
 .catalog-filters{ display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-bottom:20px; }
 .filter-chip{
   padding:9px 18px; border-radius: var(--radius-pill);
@@ -559,6 +568,22 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
 .pl-order-btn:hover{ background:#1EBE5B; transform: translateY(-2px); }
 
 body.no-scroll{ overflow:hidden; }
+
+.order-toast{
+  position:fixed; left:50%; bottom:24px; z-index:3000;
+  transform: translate(-50%, 20px);
+  max-width:min(92vw, 380px);
+  background: var(--ink); color:#fff; font-size:.85rem; font-weight:600;
+  padding:14px 20px; border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-card);
+  opacity:0; pointer-events:none;
+  transition: opacity .3s ease, transform .3s ease;
+  text-align:center;
+}
+.order-toast.show{ opacity:1; transform: translate(-50%, 0); }
+@media (max-width:760px){
+  .order-toast{ bottom: calc(78px + env(safe-area-inset-bottom)); }
+}
 
 @media (max-width:640px){
   .product-lightbox-card{ grid-template-columns:1fr; max-width:400px; }
