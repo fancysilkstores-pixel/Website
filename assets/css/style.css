@@ -765,15 +765,41 @@ body.no-scroll{ overflow:hidden; }
     content:'';
     position:absolute; inset:-6px;
     border-radius:50%;
-    background: linear-gradient(160deg, rgba(255,255,255,.55), rgba(21,95,174,.28));
-    backdrop-filter: blur(6px) saturate(180%);
-    -webkit-backdrop-filter: blur(6px) saturate(180%);
-    border: 1px solid rgba(255,255,255,.5);
-    box-shadow: 0 4px 14px rgba(21,95,174,.22), inset 0 1px 2px rgba(255,255,255,.6);
+    background:
+      radial-gradient(circle at 32% 24%, rgba(255,255,255,.95) 0%, rgba(255,255,255,.25) 32%, transparent 58%),
+      linear-gradient(155deg, rgba(255,255,255,.5) 0%, rgba(21,95,174,.4) 100%);
+    backdrop-filter: blur(9px) saturate(220%) brightness(1.18);
+    -webkit-backdrop-filter: blur(9px) saturate(220%) brightness(1.18);
+    border: 1px solid rgba(255,255,255,.7);
+    box-shadow:
+      0 6px 16px rgba(21,95,174,.3),
+      inset 0 1.5px 3px rgba(255,255,255,.9),
+      inset 0 -3px 5px rgba(21,95,174,.28);
     transform: scale(0);
     opacity:0;
     transition: transform .4s cubic-bezier(.34,1.56,.64,1), opacity .3s ease;
     z-index:-1;
+  }
+  .mobile-bottombar a .bubble-icon::after{
+    content:'';
+    position:absolute; inset:-6px;
+    border-radius:50%;
+    background: linear-gradient(115deg, transparent 32%, rgba(255,255,255,.8) 48%, rgba(255,255,255,.2) 56%, transparent 72%);
+    background-size:240% 240%;
+    background-position: 0% 0%;
+    mix-blend-mode: overlay;
+    opacity:0;
+    transition: opacity .3s ease;
+    z-index:-1;
+    pointer-events:none;
+  }
+  .mobile-bottombar a.active .bubble-icon::after{
+    opacity:1;
+    animation: liquidSheen 2.8s ease-in-out infinite;
+  }
+  @keyframes liquidSheen{
+    0%, 100%{ background-position: 10% 0%; }
+    50%{ background-position: 90% 100%; }
   }
   .mobile-bottombar a img{ width:22px; height:22px; border-radius:6px; object-fit:cover; position:relative; transition: transform .35s cubic-bezier(.34,1.56,.64,1); }
   .mobile-bottombar a svg{ width:22px; height:22px; position:relative; transition: transform .35s cubic-bezier(.34,1.56,.64,1); }
@@ -784,11 +810,12 @@ body.no-scroll{ overflow:hidden; }
   }
 
   .mobile-bottombar a:active .bubble-icon::before{
-    transform: scale(1);
+    transform: scale(.82, .9);
     opacity:1;
+    transition: transform .15s ease-out, opacity .2s ease;
   }
   .mobile-bottombar a.active .bubble-icon::before{
-    animation: liquidPop .6s cubic-bezier(.2,.8,.2,1) both;
+    animation: liquidPop .65s cubic-bezier(.2,.8,.2,1) both;
   }
   @keyframes liquidPop{
     0%{ transform: scale(0); opacity:0; border-radius:50%; }
