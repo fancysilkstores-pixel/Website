@@ -49,6 +49,18 @@ const PRODUCTS = [
 
 // Reel images — scraped Instagram photos not used as catalog cover shots
 const REEL_IMAGES = [
+  "DbN1tHZsVl__mid.jpg",
+  "DbN0ZdNJidf_mid.jpg",
+  "DbNOc0jxWoa_mid.jpg",
+  "DbLgguXzEh5_mid.jpg",
+  "DbLdr6IzC4t_mid.jpg",
+  "DbLQo4zMGkR_mid.jpg",
+  "DbLKydbMq7h_mid.jpg",
+  "DbJLL9RTDc__mid.jpg",
+  "DbJK0qkT9oW_mid.jpg",
+  "DbJK8KJzNqH_mid.jpg",
+  "DbJKmv6zWRr_mid.jpg",
+  "DbI_F59zopw_mid.jpg",
   "Da2jsgasj0M_mid.jpg",
   "Da5IrLbslTU_retry.jpg",
   "DasSdmHM1vo_mid.jpg",
