@@ -2,6 +2,13 @@
 // Fancy Silk Store — shared behavior
 // ============================================
 
+// PWA install support
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(() => {});
+  });
+}
+
 // Nav scroll state + mobile toggle
 (function(){
   const nav = document.querySelector('.site-nav');
