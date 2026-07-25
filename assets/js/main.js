@@ -19,61 +19,6 @@ function contactIsSaved(){
 }
 
 // ============================================
-// Page-to-page bubble transition (mobile) — JS-driven overlay so it works
-// on every browser, regardless of native View Transitions API support.
-// ============================================
-(function(){
-  if(!window.matchMedia('(max-width:760px)').matches) return;
-
-  const overlay = document.createElement('div');
-  overlay.className = 'page-transition-bubble';
-  document.body.appendChild(overlay);
-
-  let cameFromTransition = false;
-  try{ cameFromTransition = sessionStorage.getItem('fss_page_transition') === '1'; }catch(err){ /* ignore */ }
-  try{ sessionStorage.removeItem('fss_page_transition'); }catch(err){ /* ignore */ }
-
-  if(cameFromTransition){
-    overlay.classList.add('pt-active');
-    overlay.style.clipPath = 'circle(150% at 50% 96%)';
-    overlay.classList.add('pt-animate');
-    void overlay.offsetHeight; // force layout so the transition class above is committed before this next change
-    overlay.style.clipPath = 'circle(0% at 50% 96%)';
-    overlay.addEventListener('transitionend', () => {
-      overlay.classList.remove('pt-active', 'pt-animate');
-      overlay.style.clipPath = '';
-    }, { once: true });
-  }
-
-  document.addEventListener('click', e => {
-    if(e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
-
-    const a = e.target.closest('a');
-    if(!a) return;
-    if(a.target && a.target !== '_self') return;
-    if(a.hasAttribute('download')) return;
-
-    const rawHref = a.getAttribute('href') || '';
-    if(!rawHref || /^(#|mailto:|tel:|javascript:)/.test(rawHref)) return;
-
-    let url;
-    try{ url = new URL(a.href, window.location.href); }catch(err){ return; }
-    if(url.origin !== window.location.origin) return;
-    if(url.pathname === window.location.pathname && url.hash) return; // in-page anchor
-
-    e.preventDefault();
-    overlay.classList.add('pt-active', 'pt-animate');
-    void overlay.offsetHeight; // force layout so the transition class above is committed before this next change
-    overlay.style.clipPath = 'circle(150% at 50% 96%)';
-
-    setTimeout(() => {
-      try{ sessionStorage.setItem('fss_page_transition', '1'); }catch(err){ /* ignore */ }
-      window.location.href = url.href;
-    }, 420);
-  });
-})();
-
-// ============================================
 // Save-contact notification card (catalog page) — shown as a popup the
 // shopper must cross/dismiss before the products underneath are usable.
 // ============================================

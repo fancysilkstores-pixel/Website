@@ -2,23 +2,6 @@
    Fancy Silk Store — Design System
    ============================================ */
 
-/* ============================================
-   Page-to-page bubble transition (mobile)
-   JS-driven overlay (see main.js) — works on every browser regardless
-   of native View Transitions API support, unlike the CSS-only
-   @view-transition approach this replaces.
-   ============================================ */
-.page-transition-bubble{
-  position:fixed; inset:0; z-index:9999;
-  background: #155FAE;
-  clip-path: circle(0% at 50% 96%);
-  pointer-events:none;
-  display:none;
-}
-@media (max-width:760px){
-  .page-transition-bubble.pt-active{ display:block; }
-  .page-transition-bubble.pt-animate{ transition: clip-path .45s cubic-bezier(.2,.8,.2,1); }
-}
 :root{
   --royal-blue: #155FAE;
   --royal-blue-dark: #0F4C8A;
@@ -780,9 +763,13 @@ body.no-scroll{ overflow:hidden; }
   }
   .mobile-bottombar a .bubble-icon::before{
     content:'';
-    position:absolute; inset:0;
+    position:absolute; inset:-6px;
     border-radius:50%;
-    background: radial-gradient(circle, rgba(21,95,174,.22) 0%, rgba(21,95,174,.1) 70%, transparent 100%);
+    background: linear-gradient(160deg, rgba(255,255,255,.55), rgba(21,95,174,.28));
+    backdrop-filter: blur(6px) saturate(180%);
+    -webkit-backdrop-filter: blur(6px) saturate(180%);
+    border: 1px solid rgba(255,255,255,.5);
+    box-shadow: 0 4px 14px rgba(21,95,174,.22), inset 0 1px 2px rgba(255,255,255,.6);
     transform: scale(0);
     opacity:0;
     transition: transform .4s cubic-bezier(.34,1.56,.64,1), opacity .3s ease;
@@ -796,10 +783,18 @@ body.no-scroll{ overflow:hidden; }
     clip:rect(0,0,0,0); white-space:nowrap;
   }
 
-  .mobile-bottombar a:active .bubble-icon::before,
-  .mobile-bottombar a.active .bubble-icon::before{
+  .mobile-bottombar a:active .bubble-icon::before{
     transform: scale(1);
     opacity:1;
+  }
+  .mobile-bottombar a.active .bubble-icon::before{
+    animation: liquidPop .6s cubic-bezier(.2,.8,.2,1) both;
+  }
+  @keyframes liquidPop{
+    0%{ transform: scale(0); opacity:0; border-radius:50%; }
+    45%{ transform: scale(1.3, .75); opacity:1; border-radius:44% 56% 58% 42%/62% 44% 56% 38%; }
+    72%{ transform: scale(.88, 1.12); border-radius:56% 44% 40% 60%/42% 58% 42% 58%; }
+    100%{ transform: scale(1); opacity:1; border-radius:50%; }
   }
   .mobile-bottombar a:active img, .mobile-bottombar a:active svg,
   .mobile-bottombar a.active img, .mobile-bottombar a.active svg{
