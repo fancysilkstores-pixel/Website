@@ -210,42 +210,19 @@ initReveal();
   }
 
   function shareOrder(id, waUrl){
-    const p = PRODUCTS.find(x => x.id === Number(id));
-    if(!p){ window.open(waUrl, '_blank', 'noopener') || (window.location.href = waUrl); return; }
-
-    const message = `Hi, I'm interested in the ${p.name} (${money(p.price)}). Is it available?`;
-
-    // Feature-detect file sharing with an empty placeholder file — no network
-    // fetch needed yet, so this check can't cost us the click's user-gesture window.
-    const probe = new File([], p.image, { type: 'image/jpeg' });
-    const canShareImage = !!(navigator.canShare && navigator.canShare({ files: [probe] }));
-
-    if(canShareImage){
-      // Best case (most modern phone browsers): fetch the real image and hand
-      // it + the text to the native share sheet, pre-attached — the shopper
-      // just picks WhatsApp, picks the store as the recipient, and taps Send.
-      fetch(`/assets/images/${p.image}`)
-        .then(resp => resp.blob())
-        .then(blob => navigator.share({
-          files: [new File([blob], p.image, { type: blob.type || 'image/jpeg' })],
-          text: message,
-          title: p.name,
-        }))
-        .catch(err => {
-          if(err && err.name === 'AbortError') return; // shopper closed the share sheet — respect that
-          window.open(waUrl, '_blank', 'noopener') || (window.location.href = waUrl);
-        });
-      return;
-    }
-
-    // Fallback (desktop / browsers without file-sharing support): open the
-    // chat immediately — synchronously, before any await — since awaiting the
-    // image fetch first causes browsers to treat window.open as a blocked
-    // popup once it's no longer in the original user-gesture call stack.
+    // Always open the chat with the store's number directly and immediately —
+    // synchronously, before any await, since awaiting the image fetch first
+    // causes browsers to treat window.open as a blocked popup once it's no
+    // longer in the original user-gesture call stack. Going straight to the
+    // store's number matters more than auto-attaching the image, and WhatsApp
+    // gives no way to do both (its native Share Sheet attaches files fine but
+    // can't pre-select a recipient, so it drops the direct-open behavior).
     const win = window.open(waUrl, '_blank', 'noopener');
     if(!win) window.location.href = waUrl;
 
-    if(!navigator.clipboard || !window.ClipboardItem) return;
+    const p = PRODUCTS.find(x => x.id === Number(id));
+    if(!p || !navigator.clipboard || !window.ClipboardItem) return;
+
     fetch(`/assets/images/${p.image}`)
       .then(resp => resp.blob())
       .then(blob => navigator.clipboard.write([new ClipboardItem({ [blob.type]: blob })]))
