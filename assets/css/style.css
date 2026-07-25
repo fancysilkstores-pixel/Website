@@ -342,6 +342,7 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
   color:#fff; font-size:.72rem; font-weight:700;
 }
 .reels-cta{ text-align:center; margin-top:44px; }
+.reels-more-btn{ display:none !important; }
 
 /* ============================================
    WhatsApp / Instagram order CTA band
@@ -650,6 +651,11 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
   .values-grid{ grid-template-columns:1fr; }
   .reel-card{ width:120px; }
   .reel-card:nth-child(3){ width:136px; }
+  .reel-card.reel-extra{ display:none; }
+  .reels-more-btn{
+    display:inline-flex !important; margin:18px auto 0; padding:12px 26px;
+    border-radius:999px; font-size:.85rem;
+  }
   .carousel-card{ width:250px; }
   .carousel-card[data-pos="left1"]{ transform: translateX(-160px) scale(.8); }
   .carousel-card[data-pos="right1"]{ transform: translateX(160px) scale(.8); }

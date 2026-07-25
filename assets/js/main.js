@@ -71,14 +71,28 @@ initReveal();
 (function(){
   const row = document.querySelector('.reels-row');
   if(!row || typeof REEL_IMAGES === 'undefined') return;
-  row.innerHTML = REEL_IMAGES.map(file => `
-    <a class="reel-card" href="https://www.instagram.com/fancysilkstore" target="_blank" rel="noopener">
+  const VISIBLE_ON_MOBILE = 8;
+  row.innerHTML = REEL_IMAGES.map((file, i) => `
+    <a class="reel-card${i >= VISIBLE_ON_MOBILE ? ' reel-extra' : ''}" href="https://www.instagram.com/fancysilkstore" target="_blank" rel="noopener">
       <img src="/assets/images/${file}" alt="Fancy Silk Store Instagram reel" loading="lazy">
       <div class="reel-play"><svg viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg></div>
       <span class="reel-label">Watch on Instagram</span>
     </a>
   `).join('');
   initReveal();
+
+  if(REEL_IMAGES.length > VISIBLE_ON_MOBILE){
+    const moreBtn = document.createElement('button');
+    moreBtn.type = 'button';
+    moreBtn.className = 'btn btn-outline reels-more-btn';
+    moreBtn.textContent = 'View More Reels';
+    row.insertAdjacentElement('afterend', moreBtn);
+    moreBtn.addEventListener('click', () => {
+      row.querySelectorAll('.reel-card.reel-extra').forEach(card => card.classList.remove('reel-extra'));
+      initReveal();
+      moreBtn.remove();
+    });
+  }
 })();
 
 // ============================================
