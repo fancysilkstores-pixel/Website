@@ -25,7 +25,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/style.css?v=8">
+<link rel="stylesheet" href="/assets/css/style.css?v=9">
 
 <script type="application/ld+json">
 {
@@ -87,9 +87,35 @@
   </div>
   <div class="carousel-dots"></div>
 
+  <div class="section-head reveal" style="margin-top:70px;">
+    <span class="section-eyebrow">Full Catalog</span>
+    <h2>Every piece, listed simply</h2>
+    <p>No swiping needed — browse the full list and tap View for a closer look.</p>
+  </div>
+  <div class="product-grid">
+    <!-- rendered dynamically from PRODUCTS in products.js -->
+  </div>
+
   <div class="reels-cta reveal" style="margin:50px 0 90px;">
     <p style="margin-bottom:16px; color:#5B6472;">Like something? Order it directly — no cart needed.</p>
     <a href="https://wa.me/918699161743" class="btn btn-whatsapp"><img src="/assets/images/whatsapp-logo.jpg" class="btn-icon round" alt="">Order on WhatsApp</a>
+  </div>
+</div>
+
+<div class="product-lightbox" id="product-lightbox">
+  <div class="product-lightbox-backdrop"></div>
+  <div class="product-lightbox-card">
+    <button class="product-lightbox-close" aria-label="Close">&times;</button>
+    <div class="pl-img"><img src="" alt=""></div>
+    <div class="pl-body">
+      <span class="pl-tag"></span>
+      <h3 class="pl-name"></h3>
+      <p class="pl-fabric"></p>
+      <div class="pl-price"></div>
+      <a class="pl-order-btn" href="#" target="_blank" rel="noopener">
+        <img src="/assets/images/whatsapp-logo.jpg" class="btn-icon round" alt="">Order This
+      </a>
+    </div>
   </div>
 </div>
 
@@ -134,7 +160,7 @@
   </div>
 </footer>
 
-<script src="/assets/js/products.js?v=7"></script>
-<script src="/assets/js/main.js?v=7"></script>
+<script src="/assets/js/products.js?v=9"></script>
+<script src="/assets/js/main.js?v=9"></script>
 </body>
 </html>

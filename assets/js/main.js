@@ -80,7 +80,7 @@ initReveal();
   if(!row || typeof REEL_IMAGES === 'undefined') return;
   const VISIBLE_ON_MOBILE = 8;
   row.innerHTML = REEL_IMAGES.map((file, i) => `
-    <a class="reel-card${i >= VISIBLE_ON_MOBILE ? ' reel-extra' : ''}" href="https://www.instagram.com/fancysilkstore" target="_blank" rel="noopener">
+    <a class="reel-card${i >= VISIBLE_ON_MOBILE ? ' reel-extra' : ''}" href="https://www.instagram.com/fancy_silk_store_nakodar" target="_blank" rel="noopener">
       <img src="/assets/images/${file}" alt="Fancy Silk Store Instagram reel" loading="lazy">
       <div class="reel-play"><svg viewBox="0 0 24 24" fill="white"><path d="M8 5v14l11-7z"/></svg></div>
       <span class="reel-label">Watch on Instagram</span>
@@ -120,19 +120,80 @@ initReveal();
   function cardHTML(p){
     const msg = encodeURIComponent(`Hi, I'm interested in the ${p.name} (${money(p.price)}). Is it available?`);
     return `
-      <article class="carousel-card">
+      <article class="carousel-card" data-id="${p.id}">
         <div class="cc-img"><img src="/assets/images/${p.image}" alt="${p.name} — ${p.fabric}" loading="lazy"></div>
         <div class="cc-body">
           <span class="cc-tag">${p.category}</span>
           <h3>${p.name}</h3>
           <div class="cc-price">${money(p.price)}</div>
-          <a class="cc-order-btn" href="https://wa.me/918699161743?text=${msg}" target="_blank" rel="noopener">
-            <img src="/assets/images/whatsapp-logo.jpg" class="btn-icon round" alt="">Order This
-          </a>
+          <div class="cc-btn-row">
+            <button type="button" class="cc-view-btn" data-view="${p.id}">View</button>
+            <a class="cc-order-btn" href="https://wa.me/918699161743?text=${msg}" target="_blank" rel="noopener">
+              <img src="/assets/images/whatsapp-logo.jpg" class="btn-icon round" alt="">Order This
+            </a>
+          </div>
         </div>
       </article>
     `;
   }
+
+  function gridCardHTML(p){
+    const msg = encodeURIComponent(`Hi, I'm interested in the ${p.name} (${money(p.price)}). Is it available?`);
+    return `
+      <article class="grid-card" data-id="${p.id}">
+        <div class="gc-img"><img src="/assets/images/${p.image}" alt="${p.name} — ${p.fabric}" loading="lazy"></div>
+        <div class="gc-body">
+          <span class="gc-tag">${p.category}</span>
+          <h3>${p.name}</h3>
+          <div class="gc-price">${money(p.price)}</div>
+          <div class="gc-btn-row">
+            <button type="button" class="gc-view-btn" data-view="${p.id}">View</button>
+            <a class="gc-order-btn" href="https://wa.me/918699161743?text=${msg}" target="_blank" rel="noopener">
+              <img src="/assets/images/whatsapp-logo.jpg" class="btn-icon round" alt="">Order This
+            </a>
+          </div>
+        </div>
+      </article>
+    `;
+  }
+
+  function openLightbox(id){
+    const p = PRODUCTS.find(x => x.id === Number(id));
+    const box = document.getElementById('product-lightbox');
+    if(!p || !box) return;
+    const msg = encodeURIComponent(`Hi, I'm interested in the ${p.name} (${money(p.price)}). Is it available?`);
+    box.querySelector('.pl-img img').src = `/assets/images/${p.image}`;
+    box.querySelector('.pl-img img').alt = `${p.name} — ${p.fabric}`;
+    box.querySelector('.pl-tag').textContent = p.category;
+    box.querySelector('.pl-name').textContent = p.name;
+    box.querySelector('.pl-fabric').textContent = p.fabric;
+    box.querySelector('.pl-price').textContent = money(p.price);
+    box.querySelector('.pl-order-btn').href = `https://wa.me/918699161743?text=${msg}`;
+    box.classList.add('open');
+    document.body.classList.add('no-scroll');
+  }
+
+  function closeLightbox(){
+    const box = document.getElementById('product-lightbox');
+    if(!box) return;
+    box.classList.remove('open');
+    document.body.classList.remove('no-scroll');
+  }
+
+  (function initLightbox(){
+    const box = document.getElementById('product-lightbox');
+    if(!box) return;
+    box.querySelector('.product-lightbox-close').addEventListener('click', closeLightbox);
+    box.querySelector('.product-lightbox-backdrop').addEventListener('click', closeLightbox);
+    document.addEventListener('keydown', e => { if(e.key === 'Escape') closeLightbox(); });
+  })();
+
+  document.addEventListener('click', e => {
+    const viewBtn = e.target.closest('[data-view]');
+    if(!viewBtn) return;
+    e.preventDefault();
+    openLightbox(viewBtn.dataset.view);
+  });
 
   function renderFilters(){
     if(!filtersWrap) return;
@@ -150,6 +211,8 @@ initReveal();
     });
   }
 
+  const gridWrap = document.querySelector('.product-grid');
+
   function renderCards(){
     const list = currentCategory === 'All'
       ? PRODUCTS
@@ -157,6 +220,11 @@ initReveal();
     track.innerHTML = list.map(cardHTML).join('');
     cards = Array.from(track.querySelectorAll('.carousel-card'));
     active = 0;
+
+    if(gridWrap){
+      gridWrap.innerHTML = list.map(gridCardHTML).join('');
+      initReveal();
+    }
 
     if(dotsWrap){
       dotsWrap.innerHTML = cards.map((_, i) =>
