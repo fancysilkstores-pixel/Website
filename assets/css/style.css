@@ -22,7 +22,7 @@
 
 *{ margin:0; padding:0; box-sizing:border-box; }
 
-html{ scroll-behavior:smooth; }
+html{ scroll-behavior:smooth; overflow-x:hidden; }
 
 body{
   font-family: var(--font-main);
@@ -395,6 +395,8 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
   display:flex; align-items:center; justify-content:center;
   padding: 60px 0 30px;
   perspective: 1400px;
+  overflow-x:hidden;
+  max-width:100%;
 }
 .carousel-track{
   position:relative; height: 600px; width:100%;
@@ -659,6 +661,7 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
   .carousel-card{ width:250px; }
   .carousel-card[data-pos="left1"]{ transform: translateX(-160px) scale(.8); }
   .carousel-card[data-pos="right1"]{ transform: translateX(160px) scale(.8); }
-  .carousel-card[data-pos="left2"], .carousel-card[data-pos="right2"]{ opacity:0; }
+  .carousel-card[data-pos="left2"]{ transform: translateX(-160px) scale(.5); opacity:0; }
+  .carousel-card[data-pos="right2"]{ transform: translateX(160px) scale(.5); opacity:0; }
   .order-band{ padding:40px 24px; border-radius:24px; }
 }
