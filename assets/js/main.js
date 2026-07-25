@@ -9,6 +9,60 @@ if ('serviceWorker' in navigator) {
   });
 }
 
+// Shared "has the shopper saved our WhatsApp contact yet?" flag — set once
+// they tap Save Contact on the catalog page banner. Used to decide whether
+// Order This can safely switch to the image-attaching Share Sheet flow.
+const CONTACT_SAVED_KEY = 'fss_contact_saved';
+function contactIsSaved(){
+  try{ return localStorage.getItem(CONTACT_SAVED_KEY) === '1'; }
+  catch(err){ return false; }
+}
+
+// ============================================
+// Save-contact banner (catalog page)
+// ============================================
+(function(){
+  const banner = document.getElementById('save-contact-banner');
+  if(!banner) return;
+
+  const DISMISSED_KEY = 'fss_banner_dismissed';
+  let dismissed = false;
+  try{ dismissed = localStorage.getItem(DISMISSED_KEY) === '1'; }catch(err){ /* ignore */ }
+
+  if(!contactIsSaved() && !dismissed) banner.hidden = false;
+
+  function saveContact(){
+    const vcard = [
+      'BEGIN:VCARD',
+      'VERSION:3.0',
+      'FN:Fancy Silk Store',
+      'ORG:Fancy Silk Store',
+      'TEL;TYPE=CELL:+918699161743',
+      'END:VCARD',
+    ].join('\r\n');
+    const blob = new Blob([vcard], { type: 'text/vcard' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'Fancy Silk Store.vcf';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+
+    try{ localStorage.setItem(CONTACT_SAVED_KEY, '1'); }catch(err){ /* ignore */ }
+    banner.hidden = true;
+  }
+
+  function dismiss(){
+    try{ localStorage.setItem(DISMISSED_KEY, '1'); }catch(err){ /* ignore */ }
+    banner.hidden = true;
+  }
+
+  banner.querySelector('.scb-save-btn')?.addEventListener('click', saveContact);
+  banner.querySelector('.scb-dismiss')?.addEventListener('click', dismiss);
+})();
+
 // Nav scroll state + mobile toggle
 (function(){
   const nav = document.querySelector('.site-nav');
@@ -210,17 +264,41 @@ initReveal();
   }
 
   function shareOrder(id, waUrl){
-    // Always open the chat with the store's number directly and immediately —
+    const p = PRODUCTS.find(x => x.id === Number(id));
+    const message = p ? `Hi, I'm interested in the ${p.name} (${money(p.price)}). Is it available?` : null;
+
+    // Once the shopper has saved our number as a contact (via the banner),
+    // we no longer need the "open the chat directly" shortcut — they can pick
+    // us from their own WhatsApp contact list. So switch to the native Share
+    // Sheet instead: it auto-attaches the image (which a plain wa.me link can
+    // never do), at the cost of one extra tap to pick the (now-saved) contact.
+    const probe = p ? new File([], p.image, { type: 'image/jpeg' }) : null;
+    const canShareImage = !!(p && contactIsSaved() && navigator.canShare && navigator.canShare({ files: [probe] }));
+
+    if(canShareImage){
+      fetch(`/assets/images/${p.image}`)
+        .then(resp => resp.blob())
+        .then(blob => navigator.share({
+          files: [new File([blob], p.image, { type: blob.type || 'image/jpeg' })],
+          text: message,
+          title: p.name,
+        }))
+        .catch(err => {
+          if(err && err.name === 'AbortError') return; // shopper closed the share sheet
+          const win = window.open(waUrl, '_blank', 'noopener');
+          if(!win) window.location.href = waUrl;
+        });
+      return;
+    }
+
+    // Default (contact not saved yet, or the browser can't share files):
+    // open the chat with the store's number directly and immediately —
     // synchronously, before any await, since awaiting the image fetch first
     // causes browsers to treat window.open as a blocked popup once it's no
-    // longer in the original user-gesture call stack. Going straight to the
-    // store's number matters more than auto-attaching the image, and WhatsApp
-    // gives no way to do both (its native Share Sheet attaches files fine but
-    // can't pre-select a recipient, so it drops the direct-open behavior).
+    // longer in the original user-gesture call stack.
     const win = window.open(waUrl, '_blank', 'noopener');
     if(!win) window.location.href = waUrl;
 
-    const p = PRODUCTS.find(x => x.id === Number(id));
     if(!p || !navigator.clipboard || !window.ClipboardItem) return;
 
     fetch(`/assets/images/${p.image}`)

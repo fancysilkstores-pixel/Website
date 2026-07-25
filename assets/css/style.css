@@ -461,6 +461,26 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
 .carousel-dots span{ width:8px; height:8px; border-radius:50%; background: var(--beige-dark); transition: all .3s; }
 .carousel-dots span.active{ width:22px; background: var(--royal-blue); }
 
+.save-contact-banner{
+  background: var(--royal-blue-light); border-bottom: 1px solid var(--beige-dark);
+  padding:16px 0;
+}
+.save-contact-inner{
+  display:flex; align-items:center; gap:14px; flex-wrap:wrap;
+}
+.scb-icon{ font-size:1.6rem; flex:0 0 auto; }
+.save-contact-inner p{ flex:1 1 260px; margin:0; font-size:.9rem; color: var(--ink); }
+.scb-actions{ display:flex; align-items:center; gap:10px; flex:0 0 auto; }
+.scb-save-btn{ padding:10px 20px; font-size:.85rem; }
+.scb-dismiss{
+  width:30px; height:30px; border-radius:50%;
+  background: rgba(255,255,255,.7); color: var(--ink); font-size:1.2rem; line-height:1;
+  display:flex; align-items:center; justify-content:center;
+}
+@media (max-width:640px){
+  .scb-actions{ width:100%; justify-content:space-between; }
+}
+
 .view-toggle{ display:flex; justify-content:center; gap:10px; margin-bottom:26px; }
 .view-toggle-btn{
   padding:11px 22px; border-radius: var(--radius-pill);
