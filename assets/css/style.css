@@ -317,11 +317,11 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
   transition: transform .45s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease;
 }
 .reel-card.in-view{ opacity:1; animation: fanIn .6s cubic-bezier(.2,.8,.2,1) forwards; }
-.reel-card:nth-child(1){ --tilt:-8deg; }
-.reel-card:nth-child(2){ --tilt:-4deg; }
-.reel-card:nth-child(3){ --tilt:0deg; z-index:2; width:190px; }
-.reel-card:nth-child(4){ --tilt:4deg; }
-.reel-card:nth-child(5){ --tilt:8deg; }
+.reel-card:nth-child(5n+1){ --tilt:-8deg; }
+.reel-card:nth-child(5n+2){ --tilt:-4deg; }
+.reel-card:nth-child(5n+3){ --tilt:0deg; z-index:2; width:190px; }
+.reel-card:nth-child(5n+4){ --tilt:4deg; }
+.reel-card:nth-child(5n+5){ --tilt:8deg; }
 .reel-card:hover{
   transform: rotate(0deg) translateY(-14px) scale(1.06);
   box-shadow: 0 22px 46px rgba(28,36,48,.24);
@@ -650,7 +650,7 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
   }
   .values-grid{ grid-template-columns:1fr; }
   .reel-card{ width:120px; }
-  .reel-card:nth-child(3){ width:136px; }
+  .reel-card:nth-child(5n+3){ width:136px; }
   .reel-card.reel-extra{ display:none; }
   .reels-more-btn{
     display:inline-flex !important; margin:18px auto 0; padding:12px 26px;
