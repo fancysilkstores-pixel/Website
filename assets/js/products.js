@@ -1,0 +1,57 @@
+// ============================================
+// Fancy Silk Store — real product catalog
+// Sourced from scraped Instagram listings (prices read off watermarks)
+// ============================================
+
+const PRODUCT_CATEGORIES = ["Punjabi Suit", "Bridal Wear", "Designer Suit", "Cotton Suit"];
+
+const PRODUCTS = [
+  { id: 1, name: "Powder Blue Floral Lehenga Suit", category: "Bridal Wear", price: 12900, fabric: "Embroidered Georgette", image: "DbBVj0sTad4_mid.jpg" },
+  { id: 2, name: "Black Embellished Suit Set", category: "Designer Suit", price: 8800, fabric: "Georgette with Bead Border", image: "DbDy616TouN_mid.jpg" },
+  { id: 3, name: "Mustard Floral Lehenga Set", category: "Designer Suit", price: 14500, fabric: "Silk with Floral Embroidery", image: "DbBVsrUTzN-_mid.jpg" },
+  { id: 4, name: "Pink & White Floral Lehenga Set", category: "Bridal Wear", price: 9800, fabric: "Georgette Floral Print", image: "cover_4.jpg" },
+  { id: 5, name: "Pastel Tie-Dye Embellished Gown", category: "Designer Suit", price: 15500, fabric: "Chiffon with Stone Work", image: "DbBV1-Ozpgt_mid.jpg" },
+  { id: 6, name: "Sage Green Embroidered Suit", category: "Punjabi Suit", price: 7450, fabric: "Silk with Sequin Embroidery", image: "DbGSvh1z3j7_mid.jpg" },
+  { id: 7, name: "Mauve Jacket-Style Sharara Suit", category: "Designer Suit", price: 8990, fabric: "Silk with Zari Embroidery", image: "DbD-KuWz9ez_mid.jpg" },
+  { id: 8, name: "Turquoise Embroidered Suit", category: "Punjabi Suit", price: 2500, fabric: "Georgette with Sequin Embroidery", image: "DbGAlf2MvfB_mid.jpg" },
+  { id: 9, name: "Magenta Embroidered Lehenga", category: "Bridal Wear", price: 10800, fabric: "Net with Zari Embroidery", image: "DbGSjVKT26S_mid.jpg" },
+  { id: 10, name: "Sky Blue Floral Lehenga Set", category: "Designer Suit", price: 13900, fabric: "Silk with Floral Embroidery", image: "DbBG-AHs48M_mid.jpg" },
+  { id: 11, name: "Peach Embellished Dupatta Set", category: "Bridal Wear", price: 12500, fabric: "Net with Pearl & Tassel Work", image: "Da2xf2ks16y_mid.jpg" },
+  { id: 12, name: "Twin Embroidered Suit Set (Blush & Sage)", category: "Punjabi Suit", price: 10800, fabric: "Silk with Beaded Embroidery", image: "DbA2bzPM1F8_mid.jpg" },
+  { id: 13, name: "Burgundy Embroidered Kurta Set", category: "Punjabi Suit", price: 5290, fabric: "Silk with Threadwork Embroidery", image: "cover_13.jpg" },
+  { id: 14, name: "Grey Floral Embroidered Lehenga", category: "Designer Suit", price: 10800, fabric: "Net with Floral Embroidery", image: "Da-l_KbsolK_mid.jpg" },
+  { id: 15, name: "Peach Embroidered Sharara Set", category: "Bridal Wear", price: 6800, fabric: "Silk with Zari Embroidery", image: "Da-TV4DsgIM_mid.jpg" },
+  { id: 16, name: "Silver Floral Sequin Lehenga", category: "Designer Suit", price: 11250, fabric: "Net with Sequin & Bead Embroidery", image: "DX8wZOCOszx_mid.jpg" },
+  { id: 17, name: "Ivory Floral Print Lehenga Set", category: "Bridal Wear", price: 13900, fabric: "Georgette Floral Print with Embroidered Blouse", image: "Da0A26gsfII_mid.jpg" },
+  { id: 18, name: "Mauve Embroidered Kurta Set", category: "Punjabi Suit", price: 6800, fabric: "Silk with Zari Embroidery", image: "DbA_mMrs4pD_mid.jpg" },
+  { id: 19, name: "Yellow Embroidered Punjabi Suit", category: "Punjabi Suit", price: 11400, fabric: "Georgette with Mirror Embroidery", image: "Da0JzL7MRdh_mid.jpg" },
+  { id: 20, name: "Dusty Pink & Mint Embroidered Suit Pair", category: "Bridal Wear", price: 9800, fabric: "Georgette with Threadwork", image: "cover_20.jpg" },
+  { id: 21, name: "Pink Embroidered Net Dupatta Suit", category: "Punjabi Suit", price: 4900, fabric: "Net with Floral Embroidery", image: "Da5ULyoJkcb_mid.jpg" },
+  { id: 22, name: "Brown Embellished Kurta Set", category: "Punjabi Suit", price: 3800, fabric: "Georgette with Sequin Embroidery", image: "Dax0YRTTxK5_mid.jpg" },
+  { id: 23, name: "Silver Embellished Peplum Lehenga", category: "Designer Suit", price: 10700, fabric: "Net with Mirror & Bead Work", image: "Da5QKzfsSSw_mid.jpg" },
+  { id: 24, name: "Sage Green Bead Embroidered Suit", category: "Designer Suit", price: 9800, fabric: "Georgette with Bead Embroidery", image: "Da0OXP6z3L3_mid.jpg" },
+  { id: 25, name: "Pastel Pink & Blue Embroidered Suit Set", category: "Punjabi Suit", price: 10500, fabric: "Silk with Sequin Embroidery", image: "Dau18HfMXW7_mid.jpg" },
+  { id: 26, name: "Beige Zari Embroidered Suit", category: "Punjabi Suit", price: 6570, fabric: "Silk with Zari Embroidery", image: "cover_26.jpg" },
+  { id: 27, name: "Wine Floral Embroidered Suit", category: "Punjabi Suit", price: 8000, fabric: "Georgette with Floral Embroidery", image: "Da7w3tzsz0j_mid.jpg" },
+  { id: 28, name: "Brown Mirror Work Suit", category: "Punjabi Suit", price: 4390, fabric: "Georgette with Mirror Embroidery", image: "cover_28.jpg" },
+  { id: 29, name: "Green Embroidered Lehenga Suit", category: "Bridal Wear", price: 12500, fabric: "Silk with Tassel & Bead Work", image: "DasbyNYs6Oe_mid.jpg" },
+  { id: 30, name: "Powder Blue Embellished Lehenga", category: "Designer Suit", price: 9800, fabric: "Net with Mirror & Sequin Embroidery", image: "DbGSTv-TVeq_mid.jpg" },
+  { id: 31, name: "Dual-Tone Embroidered Lehenga Set (Green & Gold)", category: "Bridal Wear", price: 10500, fabric: "Silk with Tassel Embroidery", image: "Da8K8jpzaAk_mid.jpg" },
+  { id: 32, name: "Maroon Gold Embroidered Suit", category: "Punjabi Suit", price: 8000, fabric: "Georgette with Zari Border", image: "DasetNOs2MF_mid.jpg" },
+  { id: 33, name: "Mustard Embroidered Suit Set", category: "Punjabi Suit", price: 9150, fabric: "Silk with Zari Embroidery", image: "cover_33.jpg" },
+  { id: 34, name: "Dusty Pink Embroidered Anarkali Suit", category: "Bridal Wear", price: 9800, fabric: "Silk with Zari Embroidery", image: "cover_34.jpg" },
+  { id: 35, name: "Coffee Brown Embroidered Suit", category: "Punjabi Suit", price: 1900, fabric: "Georgette with Sequin Embroidery", image: "Da5cNHdTiRn_mid.jpg" },
+  { id: 36, name: "Grey Floral Embroidered Suit Set", category: "Punjabi Suit", price: 6830, fabric: "Net with Sequin Embroidery", image: "cover_36.jpg" },
+  { id: 37, name: "Beige Floral Embroidered Dupatta Suit", category: "Designer Suit", price: 9300, fabric: "Georgette with Floral Embroidery", image: "DavJT_JsNsN_mid.jpg" },
+  { id: 38, name: "Olive & Gold Embroidered Suit Pair", category: "Punjabi Suit", price: 11500, fabric: "Silk with Bead & Tassel Work", image: "cover_38.jpg" },
+  { id: 39, name: "Mustard Embroidered Suit (Size 40/42)", category: "Punjabi Suit", price: 2650, fabric: "Georgette with Sequin Embroidery", image: "DaxeLltMtf4_mid.jpg" },
+];
+
+// Reel images — scraped Instagram photos not used as catalog cover shots
+const REEL_IMAGES = [
+  "Da2jsgasj0M_mid.jpg",
+  "Da5IrLbslTU_retry.jpg",
+  "DasSdmHM1vo_mid.jpg",
+  "DavJg0KM4un_mid.jpg",
+  "Da7_QuDsfW2_mid.jpg",
+];
