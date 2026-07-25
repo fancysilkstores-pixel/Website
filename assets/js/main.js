@@ -280,8 +280,25 @@ function reelShortCodeFromFile(file){
     const box = document.getElementById('product-lightbox');
     if(!p || !box) return;
     const msg = encodeURIComponent(`Hi, I'm interested in the ${p.name} (${money(p.price)}). Is it available?`);
-    box.querySelector('.pl-img img').src = `/assets/images/${p.image}`;
-    box.querySelector('.pl-img img').alt = `${p.name} — ${p.fabric}`;
+
+    const img = box.querySelector('.pl-img img');
+    const video = box.querySelector('.pl-video');
+    const code = typeof reelShortCodeFromFile === 'function' ? reelShortCodeFromFile(p.image) : null;
+    const hasVideo = code && typeof REEL_VIDEO_SHORTCODES !== 'undefined' && REEL_VIDEO_SHORTCODES.has(code);
+
+    if(hasVideo){
+      video.src = `/assets/reels/${code}.mp4`;
+      video.hidden = false;
+      img.hidden = true;
+      video.play().catch(() => { /* autoplay may be blocked — controls let them tap play */ });
+    } else {
+      video.pause();
+      video.removeAttribute('src');
+      video.hidden = true;
+      img.hidden = false;
+    }
+    img.src = `/assets/images/${p.image}`;
+    img.alt = `${p.name} — ${p.fabric}`;
     box.querySelector('.pl-tag').textContent = p.category;
     box.querySelector('.pl-name').textContent = p.name;
     box.querySelector('.pl-fabric').textContent = p.fabric;
@@ -297,6 +314,8 @@ function reelShortCodeFromFile(file){
     if(!box) return;
     box.classList.remove('open');
     document.body.classList.remove('no-scroll');
+    const video = box.querySelector('.pl-video');
+    if(video){ video.pause(); }
   }
 
   (function initLightbox(){
