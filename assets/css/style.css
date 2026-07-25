@@ -4,30 +4,20 @@
 
 /* ============================================
    Page-to-page bubble transition (mobile)
-   Uses the native cross-document View Transitions API — supported
-   browsers (Chrome/Edge/Android WebView) animate every same-origin
-   navigation automatically; unsupported browsers just navigate as
-   normal, so this is a safe no-op everywhere else.
+   JS-driven overlay (see main.js) — works on every browser regardless
+   of native View Transitions API support, unlike the CSS-only
+   @view-transition approach this replaces.
    ============================================ */
-@view-transition {
-  navigation: auto;
+.page-transition-bubble{
+  position:fixed; inset:0; z-index:9999;
+  background: #155FAE;
+  clip-path: circle(0% at 50% 96%);
+  pointer-events:none;
+  display:none;
 }
-
 @media (max-width:760px){
-  ::view-transition-old(root){
-    animation: bubble-fade-out .32s ease both;
-  }
-  ::view-transition-new(root){
-    animation: bubble-expand .5s cubic-bezier(.2,.8,.2,1) both;
-  }
-  @keyframes bubble-expand{
-    from{ clip-path: circle(0% at 50% 96%); }
-    to{ clip-path: circle(150% at 50% 96%); }
-  }
-  @keyframes bubble-fade-out{
-    from{ opacity:1; }
-    to{ opacity:0; }
-  }
+  .page-transition-bubble.pt-active{ display:block; }
+  .page-transition-bubble.pt-animate{ transition: clip-path .45s cubic-bezier(.2,.8,.2,1); }
 }
 :root{
   --royal-blue: #155FAE;
@@ -274,6 +264,7 @@ button{ font-family:inherit; cursor:pointer; border:none; background:none; }
   display:flex; align-items:center; gap:10px;
   font-size:.85rem; font-weight:700; color: var(--green);
 }
+.verified-tick-icon{ width:18px; height:18px; flex:0 0 auto; }
 
 @keyframes fadeUp{ from{ opacity:0; transform: translateY(22px);} to{opacity:1; transform:translateY(0);} }
 @keyframes scaleIn{ from{ opacity:0; transform: scale(.92);} to{opacity:1; transform:scale(1);} }
