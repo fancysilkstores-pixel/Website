@@ -335,6 +335,16 @@ initReveal();
       toggleBtns.forEach(b => b.classList.toggle('active', b === btn));
       viewPanels.forEach(panel => { panel.hidden = panel.dataset.mode !== mode; });
       autoRotatePaused = mode !== 'interactive';
+      // Cards rendered while their panel was hidden never became visible to the
+      // scroll-reveal IntersectionObserver, so they'd stay stuck at opacity:0.
+      // Show them immediately instead of waiting on a scroll event that may never come.
+      const shownPanel = document.querySelector(`.catalog-view[data-mode="${mode}"]`);
+      if(shownPanel){
+        shownPanel.querySelectorAll('.reveal, .reel-card, .grid-card').forEach(el => {
+          el.dataset.observed = '1';
+          el.classList.add('in-view');
+        });
+      }
       initReveal();
     });
   });
