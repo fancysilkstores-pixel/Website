@@ -19,17 +19,27 @@ function contactIsSaved(){
 }
 
 // ============================================
-// Save-contact banner (catalog page)
+// Save-contact notification card (catalog page) — shown as a popup the
+// shopper must cross/dismiss before the products underneath are usable.
 // ============================================
 (function(){
-  const banner = document.getElementById('save-contact-banner');
-  if(!banner) return;
+  const modal = document.getElementById('save-contact-modal');
+  if(!modal) return;
 
   const DISMISSED_KEY = 'fss_banner_dismissed';
   let dismissed = false;
   try{ dismissed = localStorage.getItem(DISMISSED_KEY) === '1'; }catch(err){ /* ignore */ }
 
-  if(!contactIsSaved() && !dismissed) banner.hidden = false;
+  function openModal(){
+    modal.classList.add('open');
+    document.body.classList.add('no-scroll');
+  }
+  function closeModal(){
+    modal.classList.remove('open');
+    document.body.classList.remove('no-scroll');
+  }
+
+  if(!contactIsSaved() && !dismissed) openModal();
 
   function saveContact(){
     const vcard = [
@@ -51,16 +61,17 @@ function contactIsSaved(){
     setTimeout(() => URL.revokeObjectURL(url), 4000);
 
     try{ localStorage.setItem(CONTACT_SAVED_KEY, '1'); }catch(err){ /* ignore */ }
-    banner.hidden = true;
+    closeModal();
   }
 
   function dismiss(){
     try{ localStorage.setItem(DISMISSED_KEY, '1'); }catch(err){ /* ignore */ }
-    banner.hidden = true;
+    closeModal();
   }
 
-  banner.querySelector('.scb-save-btn')?.addEventListener('click', saveContact);
-  banner.querySelector('.scb-dismiss')?.addEventListener('click', dismiss);
+  modal.querySelector('.scb-save-btn')?.addEventListener('click', saveContact);
+  modal.querySelector('.scb-dismiss')?.addEventListener('click', dismiss);
+  modal.querySelector('.save-contact-backdrop')?.addEventListener('click', dismiss);
 })();
 
 // Nav scroll state + mobile toggle

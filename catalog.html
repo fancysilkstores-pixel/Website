@@ -25,7 +25,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/css/style.css?v=12">
+<link rel="stylesheet" href="/assets/css/style.css?v=13">
 
 <script type="application/ld+json">
 {
@@ -64,14 +64,14 @@
   <button class="nav-toggle" aria-label="Toggle menu">☰</button>
 </nav>
 
-<div class="save-contact-banner" id="save-contact-banner" hidden>
-  <div class="container save-contact-inner">
+<div class="save-contact-modal" id="save-contact-modal">
+  <div class="save-contact-backdrop"></div>
+  <div class="save-contact-card">
+    <button type="button" class="scb-dismiss" aria-label="Close">&times;</button>
     <span class="scb-icon">📱</span>
+    <h3>Save our contact first</h3>
     <p>Please save this contact before ordering anything — so when you order, you can just pick us from your WhatsApp contacts and send the photo straight over.</p>
-    <div class="scb-actions">
-      <button type="button" class="btn btn-whatsapp scb-save-btn">Save Contact</button>
-      <button type="button" class="scb-dismiss" aria-label="Dismiss">&times;</button>
-    </div>
+    <button type="button" class="btn btn-whatsapp scb-save-btn">Save Contact</button>
   </div>
 </div>
 
@@ -176,6 +176,6 @@
 </footer>
 
 <script src="/assets/js/products.js?v=9"></script>
-<script src="/assets/js/main.js?v=17"></script>
+<script src="/assets/js/main.js?v=18"></script>
 </body>
 </html>
