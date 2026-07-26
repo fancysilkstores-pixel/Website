@@ -164,15 +164,39 @@
   .signatory-caption{font-size:12px;margin-top:6px;color:#444;}
   .terms{background:var(--blue-dark);color:#f1eede;font-size:11px;padding:12px 20px;line-height:1.7;}
 
+  .payment-toggle{display:flex;gap:8px;}
+  .pay-btn{
+    flex:1;padding:9px 6px;border-radius:999px;border:1.5px solid var(--blue);
+    background:#fff;color:var(--blue);font-weight:700;font-size:12px;letter-spacing:.3px;
+    cursor:pointer;transition:all .15s ease;
+  }
+  .pay-btn:hover{transform:translateY(-2px);box-shadow:0 3px 8px rgba(0,0,0,.15);}
+  .pay-btn.active{background:var(--blue);color:#fff;border-color:var(--blue);box-shadow:0 2px 6px rgba(29,77,120,.4);}
+
+  .thermal-receipt{display:none;}
+
   @media print{
     *{
       -webkit-print-color-adjust:exact !important;
       print-color-adjust:exact !important;
       color-adjust:exact !important;
     }
+    @page{size:80mm auto;margin:3mm;}
     body{background:#fff;padding:0;}
-    .toolbar, .row-actions, .add-row{display:none !important;}
-    .invoice{border:1px solid #000;max-width:100%;box-shadow:none;border-radius:0;}
+    .toolbar, .invoice{display:none !important;}
+    .thermal-receipt{
+      display:block !important;width:80mm;margin:0 auto;color:#000;
+      font-family:'Courier New',Consolas,monospace;font-size:12px;line-height:1.45;
+    }
+    .thermal-receipt .tr-center{text-align:center;}
+    .thermal-receipt .tr-bold{font-weight:bold;}
+    .thermal-receipt .tr-shop{font-size:16px;}
+    .thermal-receipt .tr-small{font-size:11px;}
+    .thermal-receipt .tr-row{display:flex;justify-content:space-between;gap:8px;}
+    .thermal-receipt .tr-item{margin-top:3px;}
+    .thermal-receipt .tr-item-name{font-weight:bold;}
+    .thermal-receipt .tr-divider{border-top:1px dashed #000;margin:6px 0;}
+    .thermal-receipt .tr-total{font-size:14px;margin-top:2px;}
   }
 </style>
 </head>
@@ -210,8 +234,8 @@
       <div><label>GSTIN:</label> <span id="gstinMeta">03BBUPD2306L1ZR</span></div>
     </div>
     <div>
-      <div><label>Buyer Name:</label> <input type="text" id="buyerName" placeholder="Buyer / Party Name"></div>
-      <div><label>Address:</label><br><textarea id="buyerAddress" placeholder="Buyer address"></textarea></div>
+      <div><label>Buyer Name:</label> <input type="text" id="buyerName" placeholder="Buyer / Party Name" spellcheck="true" autocapitalize="words"></div>
+      <div><label>Address:</label><br><textarea id="buyerAddress" placeholder="Buyer address" spellcheck="true" autocapitalize="sentences"></textarea></div>
       <div><label>Phone:</label> <input type="text" id="buyerPhone" placeholder="Buyer phone number"></div>
     </div>
   </div>
@@ -235,9 +259,14 @@
 
   <div class="totals">
     <div class="left">
-      <div style="font-weight:700;color:var(--blue-dark);margin-bottom:6px;">Notes</div>
-      <textarea id="notes" placeholder="Any remarks for this bill..."></textarea>
-      <div style="margin-top:8px;font-size:12px;"><b>Total Items:</b> <span id="totalItems">0</span> &nbsp; <b>Total Qty:</b> <span id="totalQty">0</span></div>
+      <div style="font-weight:700;color:var(--blue-dark);margin-bottom:8px;">Payment Method</div>
+      <div class="payment-toggle" id="paymentToggle">
+        <button type="button" class="pay-btn" data-value="UPI" onclick="selectPayment('UPI')">UPI</button>
+        <button type="button" class="pay-btn" data-value="Card" onclick="selectPayment('Card')">Card</button>
+        <button type="button" class="pay-btn active" data-value="Cash" onclick="selectPayment('Cash')">Cash</button>
+      </div>
+      <input type="hidden" id="paymentMethod" value="Cash">
+      <div style="margin-top:10px;font-size:12px;"><b>Total Items:</b> <span id="totalItems">0</span> &nbsp; <b>Total Qty:</b> <span id="totalQty">0</span></div>
     </div>
     <div class="right">
       <div><span>Taxable Amount</span><span id="taxable">0.00</span></div>
@@ -270,6 +299,8 @@
   </div>
 </div>
 
+<div class="thermal-receipt" id="thermalReceipt"></div>
+
 <script>
 const CGST_RATE = 2.5;
 const SGST_RATE = 2.5;
@@ -295,7 +326,7 @@ function addRow(data){
   const sno = tbody.children.length + 1;
   tr.innerHTML = `
     <td class="sno">${sno}</td>
-    <td class="name"><input type="text" class="f-name" value="${data?data.name:''}" placeholder="Item name"></td>
+    <td class="name"><input type="text" class="f-name" value="${data?data.name:''}" placeholder="Item name" spellcheck="true" autocapitalize="words"></td>
     <td><input type="number" class="f-qty" value="${data?data.qty:''}" min="0" oninput="recalc()"></td>
     <td><input type="number" class="f-rate" value="${data?data.rate:''}" min="0" oninput="recalc()"></td>
     <td><input type="number" class="f-cgst" value="${data?data.cgst:CGST_RATE}" readonly></td>
@@ -368,6 +399,64 @@ function recalc(){
   document.getElementById('amountWords').textContent = 'Rupees ' + numToWords(grand) + ' Only';
   document.getElementById('totalItems').textContent = totalItems;
   document.getElementById('totalQty').textContent = totalQty;
+  renderThermalReceipt();
+}
+
+function selectPayment(value){
+  document.getElementById('paymentMethod').value = value;
+  document.querySelectorAll('.pay-btn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.value === value);
+  });
+  renderThermalReceipt();
+}
+
+function toTitleCase(str){
+  return str.replace(/\w\S*/g, t => t.charAt(0).toUpperCase() + t.substr(1).toLowerCase());
+}
+
+document.addEventListener('blur', (e)=>{
+  if(e.target.matches('#buyerName, .f-name') && e.target.value.trim()){
+    e.target.value = toTitleCase(e.target.value);
+  }
+}, true);
+
+function renderThermalReceipt(){
+  const data = collectBillData();
+  const itemsHtml = data.items.map(it=>{
+    const amt = ((parseFloat(it.qty)||0)*(parseFloat(it.rate)||0)).toFixed(2);
+    if(!it.name && !it.qty) return '';
+    return `<div class="tr-item">
+      <div class="tr-item-name">${it.name||''}</div>
+      <div class="tr-row tr-small"><span>${it.qty||0} x ${it.rate||0}</span><span>${amt}</span></div>
+    </div>`;
+  }).join('');
+  document.getElementById('thermalReceipt').innerHTML = `
+    <div class="tr-center tr-bold tr-shop">FANCY SILK STORE</div>
+    <div class="tr-center tr-small">Near Moh. Tandona, Malri Gate,<br>Nakodar - Distt. Jalandhar, Pin: 144040</div>
+    <div class="tr-center tr-small">Ph: 86991-61743 / 86992-25941</div>
+    <div class="tr-center tr-small">www.fancysilkstore.in</div>
+    <div class="tr-center tr-small">GSTIN: 03BBUPD2306L1ZR</div>
+    <div class="tr-divider"></div>
+    <div class="tr-row"><span>Bill No: ${data.billNo}</span><span>${data.date}</span></div>
+    <div class="tr-row"><span>Buyer:</span><span>${data.buyerName||'-'}</span></div>
+    ${data.buyerPhone ? `<div class="tr-row"><span>Phone:</span><span>${data.buyerPhone}</span></div>` : ''}
+    <div class="tr-divider"></div>
+    ${itemsHtml}
+    <div class="tr-divider"></div>
+    <div class="tr-row"><span>Taxable</span><span>${document.getElementById('taxable').textContent}</span></div>
+    <div class="tr-row"><span>CGST</span><span>${document.getElementById('cgstAmt').textContent}</span></div>
+    <div class="tr-row"><span>SGST</span><span>${document.getElementById('sgstAmt').textContent}</span></div>
+    <div class="tr-row"><span>Round Off</span><span>${document.getElementById('roundOff').textContent}</span></div>
+    <div class="tr-divider"></div>
+    <div class="tr-row tr-bold tr-total"><span>TOTAL</span><span>Rs. ${document.getElementById('grandTotal').textContent}</span></div>
+    <div class="tr-small" style="margin-top:4px;">${document.getElementById('amountWords').textContent}</div>
+    <div class="tr-divider"></div>
+    <div class="tr-row"><span>Payment:</span><span>${data.paymentMethod}</span></div>
+    <div class="tr-row"><span>Signatory:</span><span>${data.signatoryName}</span></div>
+    <div class="tr-divider"></div>
+    <div class="tr-center tr-small">Thank you for shopping with us!</div>
+    <div class="tr-center tr-small">No return without bill number.</div>
+  `;
 }
 
 function newBill(){
@@ -377,8 +466,8 @@ function newBill(){
   document.getElementById('buyerName').value = '';
   document.getElementById('buyerAddress').value = '';
   document.getElementById('buyerPhone').value = '';
-  document.getElementById('notes').value = '';
   document.getElementById('signatoryName').value = 'Sunny Dhir';
+  selectPayment('Cash');
   document.getElementById('itemsBody').innerHTML = '';
   addRow();
   recalc();
@@ -398,7 +487,7 @@ function collectBillData(){
     buyerName: document.getElementById('buyerName').value,
     buyerAddress: document.getElementById('buyerAddress').value,
     buyerPhone: document.getElementById('buyerPhone').value,
-    notes: document.getElementById('notes').value,
+    paymentMethod: document.getElementById('paymentMethod').value,
     signatoryName: document.getElementById('signatoryName').value,
     items,
     grandTotal: document.getElementById('grandTotal').textContent
@@ -420,7 +509,6 @@ function saveBill(){
     setCounter(parseInt(data.billNo,10));
   }
   localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
-  renderHistory();
   alert('Bill No. ' + data.billNo + ' saved.');
 }
 
@@ -433,7 +521,7 @@ function loadBill(billNo){
   document.getElementById('buyerName').value = data.buyerName;
   document.getElementById('buyerAddress').value = data.buyerAddress;
   document.getElementById('buyerPhone').value = data.buyerPhone;
-  document.getElementById('notes').value = data.notes || '';
+  selectPayment(data.paymentMethod || 'Cash');
   document.getElementById('signatoryName').value = data.signatoryName || 'Sunny Dhir';
   document.getElementById('itemsBody').innerHTML = '';
   data.items.forEach(it=>addRow(it));
@@ -458,14 +546,9 @@ function spawnRipple(e){
 }
 document.querySelectorAll('.toolbar button').forEach(btn=>btn.addEventListener('click', spawnRipple));
 
-const params = new URLSearchParams(location.search);
-const editNo = params.get('edit');
-if(editNo){
-  newBill();
-  loadBill(editNo);
-} else {
-  newBill();
-}
+window.addEventListener('beforeprint', renderThermalReceipt);
+
+newBill();
 </script>
 </body>
 </html>
