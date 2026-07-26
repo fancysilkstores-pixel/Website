@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Thank You - Fancy Silk Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --blue:#1d4d78;
+    --blue-dark:#123653;
+    --beige:#f6f1e3;
+    --border:#c9bd9a;
+    --text:#232323;
+    --green:#2c7f4d;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;min-height:100vh;background:linear-gradient(160deg,#dfe6ec,#eef2f5);
+    font-family:'Poppins','Segoe UI',sans-serif;color:var(--text);
+    display:flex;align-items:center;justify-content:center;padding:24px;
+  }
+  .card{
+    max-width:480px;width:100%;background:#fff;border:1px solid var(--border);border-radius:16px;
+    padding:44px 36px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.12);
+    animation:pop .5s ease-out;
+  }
+  @keyframes pop{from{opacity:0;transform:translateY(14px) scale(.97);}to{opacity:1;transform:translateY(0) scale(1);}}
+  .logo{height:76px;width:76px;object-fit:cover;border-radius:50%;border:2px solid var(--blue);box-shadow:0 2px 8px rgba(0,0,0,.2);margin-bottom:18px;}
+  .tick{
+    width:70px;height:70px;border-radius:50%;background:var(--green);color:#fff;
+    display:flex;align-items:center;justify-content:center;margin:0 auto 20px;
+    font-size:34px;animation:tick-in .5s ease-out .1s both;
+  }
+  @keyframes tick-in{from{transform:scale(0);}to{transform:scale(1);}}
+  h1{font-size:24px;font-weight:700;color:var(--blue-dark);margin:0 0 10px;}
+  p{font-size:14px;line-height:1.7;color:#555;margin:0 0 24px;}
+  .actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;}
+  a.btn{
+    text-decoration:none;padding:12px 26px;border-radius:999px;font-weight:600;font-size:14px;
+    transition:transform .15s ease,box-shadow .15s ease;display:inline-block;
+  }
+  a.btn:hover{transform:translateY(-2px);box-shadow:0 6px 14px rgba(0,0,0,.18);}
+  a.btn.primary{background:var(--blue);color:#fff;}
+  a.btn.secondary{background:var(--beige);color:var(--blue-dark);}
+  .note{margin-top:22px;font-size:12px;color:#888;}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <img src="assets/images/site-logo.jpg" alt="Fancy Silk Store logo" class="logo">
+  <div class="tick">&#10003;</div>
+  <h1>Thank You!</h1>
+  <p>Your order/request has been received. Our team at Fancy Silk Store will get in touch with you shortly to confirm the details.</p>
+  <div class="actions">
+    <a class="btn primary" href="index.html">Back to Home</a>
+    <a class="btn secondary" href="https://wa.me/918699161743" target="_blank" rel="noopener">Message us on WhatsApp</a>
+  </div>
+  <div class="note">Fancy Silk Store, Nakodar - Distt. Jalandhar</div>
+</div>
+
+</body>
+</html>
