@@ -149,6 +149,19 @@
   .sign-row{display:flex;border-top:1px solid var(--border);}
   .sign-row div{flex:1;padding:34px 16px 14px;font-size:13px;text-align:center;}
   .sign-row div:first-child{border-right:1px solid var(--border);}
+  .signatory-select{
+    font-family:'Palatino Linotype','Book Antiqua',Georgia,serif;
+    font-size:18px;font-weight:bold;color:var(--blue-dark);
+    border:none;border-bottom:2px solid var(--blue);background:transparent;
+    padding:2px 22px 4px 6px;cursor:pointer;text-align:center;text-align-last:center;
+    border-radius:0;transition:color .2s ease,border-color .2s ease,letter-spacing .2s ease;
+    appearance:none;-webkit-appearance:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6'><path d='M0 0l5 6 5-6z' fill='%231d4d78'/></svg>");
+    background-repeat:no-repeat;background-position:right 4px center;
+  }
+  .signatory-select:hover{color:var(--blue);letter-spacing:1px;}
+  .signatory-select:focus{outline:2px dashed var(--blue);}
+  .signatory-caption{font-size:12px;margin-top:6px;color:#444;}
   .terms{background:var(--blue-dark);color:#f1eede;font-size:11px;padding:12px 20px;line-height:1.7;}
 
   .history-panel{
@@ -254,7 +267,14 @@
 
   <div class="sign-row">
     <div>Customer's Signature</div>
-    <div>For <span id="signCompany">FANCY SILK STORE</span><br><br>Auth. Signatory</div>
+    <div>
+      For <span id="signCompany">FANCY SILK STORE</span><br><br>
+      <select id="signatoryName" class="signatory-select">
+        <option value="Sunny Dhir">Sunny Dhir</option>
+        <option value="Vikas Dhir">Vikas Dhir</option>
+      </select>
+      <div class="signatory-caption">Auth. Signatory</div>
+    </div>
   </div>
 
   <div class="terms">
@@ -381,6 +401,7 @@ function newBill(){
   document.getElementById('buyerAddress').value = '';
   document.getElementById('buyerPhone').value = '';
   document.getElementById('notes').value = '';
+  document.getElementById('signatoryName').value = 'Sunny Dhir';
   document.getElementById('itemsBody').innerHTML = '';
   addRow();
   recalc();
@@ -401,6 +422,7 @@ function collectBillData(){
     buyerAddress: document.getElementById('buyerAddress').value,
     buyerPhone: document.getElementById('buyerPhone').value,
     notes: document.getElementById('notes').value,
+    signatoryName: document.getElementById('signatoryName').value,
     items,
     grandTotal: document.getElementById('grandTotal').textContent
   };
@@ -435,6 +457,7 @@ function loadBill(billNo){
   document.getElementById('buyerAddress').value = data.buyerAddress;
   document.getElementById('buyerPhone').value = data.buyerPhone;
   document.getElementById('notes').value = data.notes || '';
+  document.getElementById('signatoryName').value = data.signatoryName || 'Sunny Dhir';
   document.getElementById('itemsBody').innerHTML = '';
   data.items.forEach(it=>addRow(it));
   recalc();
