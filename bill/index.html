@@ -167,6 +167,11 @@
   .history-panel button:hover{opacity:.85;}
 
   @media print{
+    *{
+      -webkit-print-color-adjust:exact !important;
+      print-color-adjust:exact !important;
+      color-adjust:exact !important;
+    }
     body{background:#fff;padding:0;}
     .toolbar, .history-panel, .row-actions, .add-row{display:none !important;}
     .invoice{border:1px solid #000;max-width:100%;box-shadow:none;border-radius:0;}
