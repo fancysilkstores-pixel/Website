@@ -164,21 +164,6 @@
   .signatory-caption{font-size:12px;margin-top:6px;color:#444;}
   .terms{background:var(--blue-dark);color:#f1eede;font-size:11px;padding:12px 20px;line-height:1.7;}
 
-  .history-panel{
-    max-width:920px;margin:18px auto;background:#fff;border:1px solid var(--border);
-    border-radius:10px;padding:16px;display:none;box-shadow:0 6px 20px rgba(0,0,0,.1);
-  }
-  .history-panel h3{margin-top:0;color:var(--blue-dark);font-family:Georgia,serif;}
-  .history-panel table{width:100%;border-collapse:collapse;font-size:13px;}
-  .history-panel th{background:var(--blue);color:#fff;padding:8px;}
-  .history-panel td{border:1px solid #ddd;padding:8px;text-align:center;}
-  .history-panel tr:hover td{background:var(--blue-light);}
-  .history-panel button{
-    padding:5px 12px;font-size:12px;border:none;border-radius:5px;cursor:pointer;margin:0 2px;
-    transition:opacity .12s;
-  }
-  .history-panel button:hover{opacity:.85;}
-
   @media print{
     *{
       -webkit-print-color-adjust:exact !important;
@@ -186,7 +171,7 @@
       color-adjust:exact !important;
     }
     body{background:#fff;padding:0;}
-    .toolbar, .history-panel, .row-actions, .add-row{display:none !important;}
+    .toolbar, .row-actions, .add-row{display:none !important;}
     .invoice{border:1px solid #000;max-width:100%;box-shadow:none;border-radius:0;}
   }
 </style>
@@ -196,7 +181,7 @@
 <div class="toolbar">
   <button onclick="newBill()">New Bill</button>
   <button onclick="saveBill()">Save Bill</button>
-  <button class="secondary" onclick="toggleHistory()">History</button>
+  <button class="secondary" onclick="location.href='../history.html'">History</button>
   <button onclick="window.print()">Print</button>
 </div>
 
@@ -283,14 +268,6 @@
     3. Interest @ 24% p.a. will be charged if the bill is not paid within 7 days.<br>
     4. Our responsibility ceases as soon as goods are delivered to the carriers.
   </div>
-</div>
-
-<div class="history-panel" id="historyPanel">
-  <h3>Bill History</h3>
-  <table id="historyTable">
-    <thead><tr><th>Bill No.</th><th>Date</th><th>Buyer</th><th>Grand Total</th><th>Actions</th></tr></thead>
-    <tbody></tbody>
-  </table>
 </div>
 
 <script>
@@ -461,37 +438,6 @@ function loadBill(billNo){
   document.getElementById('itemsBody').innerHTML = '';
   data.items.forEach(it=>addRow(it));
   recalc();
-  toggleHistory();
-}
-
-function deleteBill(billNo){
-  if(!confirm('Delete Bill No. ' + billNo + '?')) return;
-  let history = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-  history = history.filter(h=>h.billNo !== billNo);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
-  renderHistory();
-}
-
-function renderHistory(){
-  const history = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-  const tbody = document.querySelector('#historyTable tbody');
-  tbody.innerHTML = '';
-  history.slice().reverse().forEach(h=>{
-    const tr = document.createElement('tr');
-    tr.innerHTML = `
-      <td>${h.billNo}</td><td>${h.date}</td><td>${h.buyerName||''}</td><td>${h.grandTotal}</td>
-      <td>
-        <button style="background:#2c7f4d;color:#fff;" onclick="loadBill('${h.billNo}')">Open</button>
-        <button style="background:#c0392b;color:#fff;" onclick="deleteBill('${h.billNo}')">Delete</button>
-      </td>`;
-    tbody.appendChild(tr);
-  });
-}
-
-function toggleHistory(){
-  const p = document.getElementById('historyPanel');
-  p.style.display = p.style.display === 'block' ? 'none' : 'block';
-  if(p.style.display === 'block') renderHistory();
 }
 
 document.getElementById('companyName').addEventListener('input', ()=>{
@@ -512,7 +458,14 @@ function spawnRipple(e){
 }
 document.querySelectorAll('.toolbar button').forEach(btn=>btn.addEventListener('click', spawnRipple));
 
-newBill();
+const params = new URLSearchParams(location.search);
+const editNo = params.get('edit');
+if(editNo){
+  newBill();
+  loadBill(editNo);
+} else {
+  newBill();
+}
 </script>
 </body>
 </html>

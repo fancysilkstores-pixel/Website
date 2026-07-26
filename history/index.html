@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Fancy Silk Store - Bill History</title>
+<style>
+  :root{
+    --blue:#1d4d78;
+    --blue-dark:#123653;
+    --blue-light:#eaf2fa;
+    --beige:#f6f1e3;
+    --border:#c9bd9a;
+    --text:#232323;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;background:#dfe6ec;padding:24px;
+    font-family:'Segoe UI',Tahoma,Verdana,sans-serif;color:var(--text);
+  }
+  .topbar{max-width:1000px;margin:0 auto 16px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;}
+  .topbar h1{
+    font-family:Georgia,'Times New Roman',serif;font-size:24px;color:var(--blue-dark);margin:0;
+  }
+  .topbar .actions{display:flex;gap:10px;}
+  button{
+    padding:10px 22px;border:none;border-radius:999px;background:var(--blue);color:#fff;
+    font-weight:600;cursor:pointer;font-size:14px;letter-spacing:.3px;
+    transition:transform .12s ease,background .12s ease,box-shadow .12s ease;
+    box-shadow:0 2px 4px rgba(0,0,0,.15);
+  }
+  button:hover{background:var(--blue-dark);transform:translateY(-2px);box-shadow:0 4px 10px rgba(0,0,0,.2);}
+  button:active{transform:translateY(0) scale(.96);}
+
+  .panel{
+    max-width:1000px;margin:0 auto;background:#fff;border:1px solid var(--border);
+    border-radius:10px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,.12);
+  }
+  table{width:100%;border-collapse:collapse;font-size:14px;}
+  thead th{background:var(--blue);color:#fff;padding:12px 10px;text-align:left;font-weight:600;}
+  tbody td{border-bottom:1px solid #e5e0d0;padding:10px;}
+  tbody tr:nth-child(even){background:#fafafa;}
+  tbody tr:hover{background:var(--blue-light);}
+  .amount{font-weight:700;color:var(--blue-dark);}
+  .row-btns{display:flex;gap:6px;flex-wrap:wrap;}
+  .row-btns button{
+    padding:6px 12px;font-size:12px;border-radius:999px;
+  }
+  .btn-preview{background:#3a6ea5;}
+  .btn-pdf{background:#2c7f4d;}
+  .btn-edit{background:#a3792f;}
+  .btn-delete{background:#c0392b;}
+  .empty-state{padding:40px;text-align:center;color:#777;font-size:15px;}
+
+  /* Modal preview */
+  .modal-backdrop{
+    position:fixed;inset:0;background:rgba(0,0,0,.55);display:none;
+    align-items:flex-start;justify-content:center;overflow:auto;padding:30px 12px;z-index:50;
+  }
+  .modal-backdrop.open{display:flex;}
+  .modal-shell{max-width:920px;width:100%;}
+  .modal-toolbar{
+    max-width:920px;margin:0 auto 10px;display:flex;justify-content:flex-end;gap:10px;
+  }
+  .modal-toolbar button{font-size:13px;padding:8px 18px;}
+  .btn-close{background:#555;}
+
+  /* Invoice template (mirrors bill.html look) */
+  .invoice{
+    max-width:920px;margin:0 auto;background:#fff;border:1px solid var(--border);
+    border-radius:10px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,.12);
+  }
+  .head-band{
+    background:linear-gradient(135deg,var(--blue),var(--blue-dark));color:#fff;
+    padding:16px 22px;position:relative;
+  }
+  .head-band .gstin{font-size:12px;font-weight:600;letter-spacing:.4px;}
+  .head-band .phones{position:absolute;top:14px;right:20px;font-size:12px;text-align:right;opacity:.95;}
+  .head-band .tax-invoice-label{text-align:center;font-size:26px;font-weight:bold;letter-spacing:3px;}
+  .head-band .tax-invoice-label .bill-word{display:block;font-size:12px;font-weight:normal;letter-spacing:3px;margin-top:4px;opacity:.9;font-variant:small-caps;}
+  .company-row{background:var(--beige);padding:16px 10px 8px;text-align:center;display:flex;align-items:center;justify-content:center;gap:16px;}
+  .company-logo{height:64px;width:64px;object-fit:cover;border-radius:50%;border:2px solid var(--blue);box-shadow:0 2px 6px rgba(0,0,0,.25);}
+  .company-name{
+    font-family:'Palatino Linotype','Book Antiqua',Georgia,serif;
+    font-size:32px;font-weight:bold;color:var(--blue-dark);
+    border-bottom:3px solid var(--blue);padding-bottom:6px;letter-spacing:1px;
+  }
+  .company-sub{text-align:center;font-size:13px;padding:3px 20px;color:#444;background:var(--beige);}
+  .company-sub:last-of-type{padding-bottom:14px;}
+  .meta-row{display:flex;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+  .meta-row > div{flex:1;padding:14px 20px;font-size:13px;line-height:1.9;background:#fff;}
+  .meta-row > div:first-child{border-right:1px solid var(--border);background:var(--blue-light);}
+  .meta-row label{font-weight:700;display:inline-block;min-width:95px;color:var(--blue-dark);}
+  table.items{width:100%;border-collapse:collapse;font-size:13px;}
+  table.items th{background:var(--blue);color:#fff;padding:10px 8px;font-weight:600;letter-spacing:.3px;}
+  table.items td{border:1px solid var(--border);padding:8px;text-align:center;}
+  table.items td.name{text-align:left;}
+  .totals{display:flex;border-top:1px solid var(--border);}
+  .totals .left{flex:1.3;padding:14px 20px;font-size:13px;background:var(--beige);}
+  .totals .right{flex:1;padding:0;font-size:13px;border-left:1px solid var(--border);}
+  .totals .right div{display:flex;justify-content:space-between;padding:8px 20px;border-bottom:1px solid #ddd;}
+  .totals .right div.grand{font-weight:bold;font-size:16px;border-top:1px solid var(--border);background:var(--blue);color:#fff;}
+  .words-row{border-top:1px solid var(--border);padding:12px 20px;font-size:13px;font-weight:600;background:var(--blue-light);}
+  .sign-row{display:flex;border-top:1px solid var(--border);}
+  .sign-row div{flex:1;padding:34px 16px 14px;font-size:13px;text-align:center;}
+  .sign-row div:first-child{border-right:1px solid var(--border);}
+  .signatory-name{font-family:'Palatino Linotype','Book Antiqua',Georgia,serif;font-size:18px;font-weight:bold;color:var(--blue-dark);border-bottom:2px solid var(--blue);display:inline-block;padding:0 10px 4px;}
+  .signatory-caption{font-size:12px;margin-top:6px;color:#444;}
+  .terms{background:var(--blue-dark);color:#f1eede;font-size:11px;padding:12px 20px;line-height:1.7;}
+
+  @media print{
+    *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;color-adjust:exact !important;}
+    body{background:#fff;padding:0;}
+    .topbar, .panel, .modal-toolbar, .modal-backdrop{display:none !important;}
+    body.printing-modal .modal-backdrop{
+      display:flex !important;position:static;background:none;padding:0;
+    }
+    body.printing-modal .modal-toolbar{display:none !important;}
+    body.printing-modal .invoice{border:1px solid #000;box-shadow:none;border-radius:0;max-width:100%;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>Bill History</h1>
+  <div class="actions">
+    <button onclick="location.href='../bill.html'">+ New Bill</button>
+  </div>
+</div>
+
+<div class="panel">
+  <table>
+    <thead>
+      <tr><th>Bill No.</th><th>Date</th><th>Buyer</th><th>Grand Total</th><th>Actions</th></tr>
+    </thead>
+    <tbody id="historyBody"></tbody>
+  </table>
+  <div class="empty-state" id="emptyState" style="display:none;">No bills saved yet. Create one from "New Bill".</div>
+</div>
+
+<div class="modal-backdrop" id="modalBackdrop">
+  <div class="modal-shell">
+    <div class="modal-toolbar">
+      <button class="btn-pdf" onclick="downloadPdf()">Save as PDF</button>
+      <button class="btn-close" onclick="closeModal()">Close</button>
+    </div>
+    <div class="invoice" id="previewInvoice"></div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'billing_history_v1';
+const LOGO = '../assets/images/site-logo.jpg';
+
+function getHistory(){
+  return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+}
+
+function numToWords(num){
+  const a = ['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
+  const b = ['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
+  function two(n){ if(n<20) return a[n]; return b[Math.floor(n/10)] + (n%10? ' '+a[n%10] : ''); }
+  function three(n){ if(n>99) return a[Math.floor(n/100)] + ' Hundred' + (n%100? ' ' + two(n%100) : ''); return two(n); }
+  if(num===0) return 'Zero';
+  let str='';
+  const crore = Math.floor(num/10000000); num %= 10000000;
+  const lakh = Math.floor(num/100000); num %= 100000;
+  const thousand = Math.floor(num/1000); num %= 1000;
+  const rest = num;
+  if(crore) str += three(crore) + ' Crore ';
+  if(lakh) str += three(lakh) + ' Lakh ';
+  if(thousand) str += three(thousand) + ' Thousand ';
+  if(rest) str += three(rest);
+  return str.trim();
+}
+
+function computeTotals(items){
+  let taxable = 0;
+  items.forEach(it=>{
+    const qty = parseFloat(it.qty) || 0;
+    const rate = parseFloat(it.rate) || 0;
+    taxable += qty*rate;
+  });
+  const cgst = taxable*2.5/100;
+  const sgst = taxable*2.5/100;
+  const raw = taxable+cgst+sgst;
+  const grand = Math.round(raw);
+  const roundOff = grand-raw;
+  return {taxable,cgst,sgst,roundOff,grand};
+}
+
+function renderList(){
+  const history = getHistory();
+  const tbody = document.getElementById('historyBody');
+  const empty = document.getElementById('emptyState');
+  tbody.innerHTML = '';
+  if(!history.length){ empty.style.display='block'; return; }
+  empty.style.display='none';
+  history.slice().reverse().forEach(h=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${h.billNo}</td>
+      <td>${h.date||''}</td>
+      <td>${h.buyerName||'-'}</td>
+      <td class="amount">Rs. ${h.grandTotal}</td>
+      <td class="row-btns">
+        <button class="btn-preview" onclick="previewBill('${h.billNo}')">Preview</button>
+        <button class="btn-pdf" onclick="previewBill('${h.billNo}', true)">PDF</button>
+        <button class="btn-edit" onclick="location.href='../bill.html?edit=${h.billNo}'">Edit</button>
+        <button class="btn-delete" onclick="deleteBill('${h.billNo}')">Delete</button>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function deleteBill(billNo){
+  if(!confirm('Delete Bill No. ' + billNo + '?')) return;
+  let history = getHistory().filter(h=>h.billNo !== billNo);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+  renderList();
+}
+
+function buildInvoiceHTML(h){
+  const totals = computeTotals(h.items||[]);
+  const rows = (h.items||[]).map((it,i)=>`
+    <tr>
+      <td>${i+1}</td>
+      <td class="name">${it.name||''}</td>
+      <td>${it.qty||0}</td>
+      <td>${it.rate||0}</td>
+      <td>${it.cgst||2.5}</td>
+      <td>${it.sgst||2.5}</td>
+      <td>${((parseFloat(it.qty)||0)*(parseFloat(it.rate)||0)).toFixed(2)}</td>
+    </tr>`).join('');
+  return `
+    <div class="head-band">
+      <div class="gstin">GSTIN : 03BBUPD2306L1ZR</div>
+      <div class="phones"><div>+91 86991-61743</div><div>+91 86992-25941</div></div>
+      <div class="tax-invoice-label">TAX INVOICE<span class="bill-word">BILL</span></div>
+    </div>
+    <div class="company-row">
+      <img src="${LOGO}" alt="Fancy Silk Store logo" class="company-logo">
+      <div class="company-name">FANCY SILK STORE</div>
+    </div>
+    <div class="company-sub">Near Moh. Tandona, Malri Gate, Nakodar - Distt. Jalandhar, Pin: 144040</div>
+    <div class="company-sub">www.fancysilkstore.in</div>
+    <div class="meta-row">
+      <div>
+        <div><label>Bill No.:</label> ${h.billNo}</div>
+        <div><label>Dated:</label> ${h.date||''}</div>
+        <div><label>State Code:</label> 03</div>
+        <div><label>GSTIN:</label> 03BBUPD2306L1ZR</div>
+      </div>
+      <div>
+        <div><label>Buyer Name:</label> ${h.buyerName||''}</div>
+        <div><label>Address:</label> ${h.buyerAddress||''}</div>
+        <div><label>Phone:</label> ${h.buyerPhone||''}</div>
+      </div>
+    </div>
+    <table class="items">
+      <thead>
+        <tr><th>S.No.</th><th>Name</th><th>Qty</th><th>Rate</th><th>CGST %</th><th>SGST %</th><th>Amount</th></tr>
+      </thead>
+      <tbody>${rows}</tbody>
+    </table>
+    <div class="totals">
+      <div class="left">
+        <div style="font-weight:700;color:var(--blue-dark);margin-bottom:6px;">Notes</div>
+        <div>${h.notes||'-'}</div>
+      </div>
+      <div class="right">
+        <div><span>Taxable Amount</span><span>${totals.taxable.toFixed(2)}</span></div>
+        <div><span>CGST</span><span>${totals.cgst.toFixed(2)}</span></div>
+        <div><span>SGST</span><span>${totals.sgst.toFixed(2)}</span></div>
+        <div><span>Round Off</span><span>${totals.roundOff.toFixed(2)}</span></div>
+        <div class="grand"><span>Grand Total</span><span>${totals.grand.toFixed(2)}</span></div>
+      </div>
+    </div>
+    <div class="words-row">Amount in words: Rupees ${numToWords(totals.grand)} Only</div>
+    <div class="sign-row">
+      <div>Customer's Signature</div>
+      <div>
+        For FANCY SILK STORE<br><br>
+        <span class="signatory-name">${h.signatoryName||'Sunny Dhir'}</span>
+        <div class="signatory-caption">Auth. Signatory</div>
+      </div>
+    </div>
+    <div class="terms">
+      Terms &amp; Conditions:<br>
+      1. All disputes subject to local jurisdiction only. &nbsp; 2. No return without bill number.<br>
+      3. Interest @ 24% p.a. will be charged if the bill is not paid within 7 days.<br>
+      4. Our responsibility ceases as soon as goods are delivered to the carriers.
+    </div>`;
+}
+
+let printAfterOpen = false;
+
+function previewBill(billNo, forPdf){
+  const h = getHistory().find(b=>b.billNo === billNo);
+  if(!h) return;
+  document.getElementById('previewInvoice').innerHTML = buildInvoiceHTML(h);
+  document.getElementById('modalBackdrop').classList.add('open');
+  if(forPdf){
+    printAfterOpen = true;
+    setTimeout(()=>{ downloadPdf(); }, 150);
+  }
+}
+
+function downloadPdf(){
+  document.body.classList.add('printing-modal');
+  window.print();
+}
+
+window.addEventListener('afterprint', ()=>{
+  document.body.classList.remove('printing-modal');
+});
+
+function closeModal(){
+  document.getElementById('modalBackdrop').classList.remove('open');
+}
+
+document.getElementById('modalBackdrop').addEventListener('click', (e)=>{
+  if(e.target.id === 'modalBackdrop') closeModal();
+});
+
+renderList();
+</script>
+</body>
+</html>
