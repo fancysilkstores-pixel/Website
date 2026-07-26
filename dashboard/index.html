@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Fancy Silk Store - Dashboard</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --blue:#1d4d78;
+    --blue-dark:#123653;
+    --blue-light:#eaf2fa;
+    --beige:#f6f1e3;
+    --border:#c9bd9a;
+    --text:#232323;
+    --green:#2c7f4d;
+    --red:#c0392b;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;background:#dfe6ec;padding:24px;
+    font-family:'Segoe UI',Tahoma,Verdana,sans-serif;color:var(--text);
+  }
+  .topbar{max-width:1200px;margin:0 auto 20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;}
+  .topbar h1{font-family:Georgia,'Times New Roman',serif;font-size:26px;color:var(--blue-dark);margin:0;}
+  .topbar .actions{display:flex;gap:10px;flex-wrap:wrap;}
+  button{
+    padding:10px 20px;border:none;border-radius:999px;background:var(--blue);color:#fff;
+    font-weight:600;cursor:pointer;font-size:13px;letter-spacing:.3px;
+    transition:transform .12s ease,background .12s ease,box-shadow .12s ease;
+    box-shadow:0 2px 4px rgba(0,0,0,.15);
+  }
+  button:hover{background:var(--blue-dark);transform:translateY(-2px);box-shadow:0 4px 10px rgba(0,0,0,.2);}
+  button:active{transform:translateY(0) scale(.96);}
+  button.secondary{background:#6b6b6b;}
+  button.secondary:hover{background:#4d4d4d;}
+
+  .wrap{max-width:1200px;margin:0 auto;}
+
+  .stat-grid{
+    display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:20px;
+  }
+  .stat-card{
+    background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px 18px;
+    box-shadow:0 4px 12px rgba(0,0,0,.08);transition:transform .15s ease,box-shadow .15s ease;
+  }
+  .stat-card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(0,0,0,.14);}
+  .stat-card .label{font-size:12px;color:#666;font-weight:600;letter-spacing:.3px;text-transform:uppercase;}
+  .stat-card .value{font-size:26px;font-weight:bold;color:var(--blue-dark);margin-top:6px;font-family:Georgia,serif;}
+  .stat-card .delta{font-size:12px;margin-top:6px;font-weight:600;}
+  .delta.up{color:var(--green);}
+  .delta.down{color:var(--red);}
+  .delta.flat{color:#888;}
+
+  .chart-grid{
+    display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px;
+  }
+  @media (max-width:800px){.chart-grid{grid-template-columns:1fr;}}
+  .panel{
+    background:#fff;border:1px solid var(--border);border-radius:12px;padding:18px;
+    box-shadow:0 4px 12px rgba(0,0,0,.08);
+  }
+  .panel h3{
+    margin:0 0 14px;font-family:Georgia,serif;font-size:16px;color:var(--blue-dark);
+    border-bottom:2px solid var(--beige);padding-bottom:8px;
+  }
+  .chart-holder{position:relative;height:260px;}
+
+  .bottom-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  @media (max-width:800px){.bottom-grid{grid-template-columns:1fr;}}
+
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  thead th{background:var(--blue);color:#fff;padding:8px 10px;text-align:left;font-weight:600;}
+  tbody td{border-bottom:1px solid #eee;padding:8px 10px;}
+  tbody tr:hover{background:var(--blue-light);}
+  .amount{font-weight:700;color:var(--blue-dark);}
+  .empty-state{padding:30px;text-align:center;color:#777;font-size:14px;}
+
+  .top-item-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .top-item-name{flex:1;font-size:13px;}
+  .top-item-bar-bg{flex:2;background:var(--blue-light);border-radius:6px;height:10px;overflow:hidden;}
+  .top-item-bar-fill{background:var(--blue);height:100%;border-radius:6px;transition:width .4s ease;}
+  .top-item-qty{width:50px;text-align:right;font-size:12px;font-weight:700;color:var(--blue-dark);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>Sales Dashboard</h1>
+  <div class="actions">
+    <button onclick="location.href='../bill.html'">+ New Bill</button>
+    <button class="secondary" onclick="location.href='../history.html'">History</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="stat-grid" id="statGrid"></div>
+
+  <div class="chart-grid">
+    <div class="panel">
+      <h3>Revenue Trend (Last 14 Days)</h3>
+      <div class="chart-holder"><canvas id="trendChart"></canvas></div>
+    </div>
+    <div class="panel">
+      <h3>Payment Method Split</h3>
+      <div class="chart-holder"><canvas id="paymentChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="bottom-grid">
+    <div class="panel">
+      <h3>Top Selling Items (by Qty)</h3>
+      <div id="topItems"></div>
+    </div>
+    <div class="panel">
+      <h3>Recent Bills</h3>
+      <table>
+        <thead><tr><th>Bill No.</th><th>Date</th><th>Buyer</th><th>Total</th></tr></thead>
+        <tbody id="recentBody"></tbody>
+      </table>
+      <div class="empty-state" id="recentEmpty" style="display:none;">No bills yet.</div>
+    </div>
+  </div>
+</div>
+
+<script>
+const STORAGE_KEY = 'billing_history_v1';
+
+function getHistory(){
+  return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+}
+
+function dateOnly(d){ return d.slice(0,10); }
+
+function fmt(n){
+  return 'Rs. ' + (Math.round(n*100)/100).toLocaleString('en-IN', {minimumFractionDigits:2, maximumFractionDigits:2});
+}
+
+function buildStats(history){
+  const now = new Date();
+  const today = now.toISOString().slice(0,10);
+  const yestDate = new Date(now); yestDate.setDate(yestDate.getDate()-1);
+  const yesterday = yestDate.toISOString().slice(0,10);
+
+  const monthStr = today.slice(0,7);
+  const lastMonthDate = new Date(now.getFullYear(), now.getMonth()-1, 1);
+  const lastMonthStr = lastMonthDate.toISOString().slice(0,7);
+
+  let totalRevenue=0, todayRevenue=0, yesterdayRevenue=0, monthRevenue=0, lastMonthRevenue=0;
+  history.forEach(h=>{
+    const amt = parseFloat(h.grandTotal) || 0;
+    const d = h.date || '';
+    totalRevenue += amt;
+    if(d === today) todayRevenue += amt;
+    if(d === yesterday) yesterdayRevenue += amt;
+    if(d.slice(0,7) === monthStr) monthRevenue += amt;
+    if(d.slice(0,7) === lastMonthStr) lastMonthRevenue += amt;
+  });
+
+  const totalBills = history.length;
+  const avgBill = totalBills ? totalRevenue/totalBills : 0;
+
+  function pctDelta(cur, prev){
+    if(prev === 0) return cur > 0 ? {pct:100, dir:'up'} : {pct:0, dir:'flat'};
+    const pct = ((cur-prev)/prev)*100;
+    return {pct: Math.abs(Math.round(pct)), dir: pct>0.5?'up':(pct<-0.5?'down':'flat')};
+  }
+  const dayDelta = pctDelta(todayRevenue, yesterdayRevenue);
+  const monthDelta = pctDelta(monthRevenue, lastMonthRevenue);
+
+  return {totalRevenue, todayRevenue, monthRevenue, totalBills, avgBill, dayDelta, monthDelta};
+}
+
+function renderStats(stats){
+  const arrow = d => d==='up' ? '&#9650;' : d==='down' ? '&#9660;' : '&#9679;';
+  const cards = [
+    {label:"Today's Revenue", value: fmt(stats.todayRevenue), delta: `${arrow(stats.dayDelta.dir)} ${stats.dayDelta.pct}% vs yesterday`, dir: stats.dayDelta.dir},
+    {label:'This Month', value: fmt(stats.monthRevenue), delta: `${arrow(stats.monthDelta.dir)} ${stats.monthDelta.pct}% vs last month`, dir: stats.monthDelta.dir},
+    {label:'Total Revenue', value: fmt(stats.totalRevenue), delta: `${stats.totalBills} bill(s) all-time`, dir:'flat'},
+    {label:'Average Bill Value', value: fmt(stats.avgBill), delta: 'per transaction', dir:'flat'},
+  ];
+  document.getElementById('statGrid').innerHTML = cards.map(c=>`
+    <div class="stat-card">
+      <div class="label">${c.label}</div>
+      <div class="value">${c.value}</div>
+      <div class="delta ${c.dir}">${c.delta}</div>
+    </div>`).join('');
+}
+
+function renderTrendChart(history){
+  const days = [];
+  const now = new Date();
+  for(let i=13;i>=0;i--){
+    const d = new Date(now); d.setDate(d.getDate()-i);
+    days.push(d.toISOString().slice(0,10));
+  }
+  const revenueByDay = {};
+  days.forEach(d=>revenueByDay[d]=0);
+  history.forEach(h=>{
+    const d = h.date;
+    if(d in revenueByDay) revenueByDay[d] += parseFloat(h.grandTotal)||0;
+  });
+  const labels = days.map(d=>d.slice(5).split('-').reverse().join('/'));
+  const data = days.map(d=>revenueByDay[d]);
+
+  new Chart(document.getElementById('trendChart'), {
+    type:'line',
+    data:{
+      labels,
+      datasets:[{
+        label:'Revenue',
+        data,
+        borderColor:'#1d4d78',
+        backgroundColor:'rgba(29,77,120,0.12)',
+        fill:true,
+        tension:0.3,
+        pointRadius:3,
+        pointBackgroundColor:'#1d4d78'
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{ y:{ beginAtZero:true, ticks:{ callback:v=>'Rs.'+v } } }
+    }
+  });
+}
+
+function renderPaymentChart(history){
+  const counts = {UPI:0, Card:0, Cash:0, Other:0};
+  history.forEach(h=>{
+    const m = h.paymentMethod || 'Cash';
+    counts[m] = (counts[m]||0) + (parseFloat(h.grandTotal)||0);
+  });
+  const labels = Object.keys(counts).filter(k=>counts[k]>0);
+  const data = labels.map(k=>counts[k]);
+  if(!labels.length){ labels.push('No data'); data.push(1); }
+
+  new Chart(document.getElementById('paymentChart'), {
+    type:'doughnut',
+    data:{
+      labels,
+      datasets:[{
+        data,
+        backgroundColor:['#1d4d78','#c9a227','#2c7f4d','#a3792f','#999'],
+        borderWidth:2,borderColor:'#fff'
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom',labels:{boxWidth:12,font:{size:11}}}}
+    }
+  });
+}
+
+function renderTopItems(history){
+  const qtyByItem = {};
+  history.forEach(h=>{
+    (h.items||[]).forEach(it=>{
+      const name = (it.name||'').trim();
+      if(!name) return;
+      qtyByItem[name] = (qtyByItem[name]||0) + (parseFloat(it.qty)||0);
+    });
+  });
+  const sorted = Object.entries(qtyByItem).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const holder = document.getElementById('topItems');
+  if(!sorted.length){
+    holder.innerHTML = '<div class="empty-state">No items sold yet.</div>';
+    return;
+  }
+  const max = sorted[0][1];
+  holder.innerHTML = sorted.map(([name,qty])=>`
+    <div class="top-item-row">
+      <div class="top-item-name">${name}</div>
+      <div class="top-item-bar-bg"><div class="top-item-bar-fill" style="width:${(qty/max*100).toFixed(0)}%"></div></div>
+      <div class="top-item-qty">${qty}</div>
+    </div>`).join('');
+}
+
+function renderRecent(history){
+  const tbody = document.getElementById('recentBody');
+  const empty = document.getElementById('recentEmpty');
+  const recent = history.slice().reverse().slice(0,8);
+  if(!recent.length){ empty.style.display='block'; tbody.innerHTML=''; return; }
+  empty.style.display='none';
+  tbody.innerHTML = recent.map(h=>`
+    <tr>
+      <td>${h.billNo}</td>
+      <td>${h.date||''}</td>
+      <td>${h.buyerName||'-'}</td>
+      <td class="amount">Rs. ${h.grandTotal}</td>
+    </tr>`).join('');
+}
+
+function init(){
+  const history = getHistory();
+  renderStats(buildStats(history));
+  renderTrendChart(history);
+  renderPaymentChart(history);
+  renderTopItems(history);
+  renderRecent(history);
+}
+
+init();
+</script>
+</body>
+</html>

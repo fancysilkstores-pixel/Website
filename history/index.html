@@ -30,6 +30,8 @@
   }
   button:hover{background:var(--blue-dark);transform:translateY(-2px);box-shadow:0 4px 10px rgba(0,0,0,.2);}
   button:active{transform:translateY(0) scale(.96);}
+  button.secondary{background:#6b6b6b;}
+  button.secondary:hover{background:#4d4d4d;}
 
   .panel{
     max-width:1000px;margin:0 auto;background:#fff;border:1px solid var(--border);
@@ -120,6 +122,7 @@
   <h1>Bill History</h1>
   <div class="actions">
     <button onclick="location.href='../bill.html'">+ New Bill</button>
+    <button class="secondary" onclick="location.href='../dashboard.html'">Dashboard</button>
   </div>
 </div>
 
