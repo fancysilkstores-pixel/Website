@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Fancy Silk Store - Billing</title>
+<style>
+  :root{
+    --blue:#1d4d78;
+    --blue-dark:#123653;
+    --blue-light:#eaf2fa;
+    --beige:#f6f1e3;
+    --beige-dark:#e9dfc4;
+    --border:#c9bd9a;
+    --text:#232323;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;background:#dfe6ec;padding:24px;
+    font-family:'Segoe UI',Tahoma,Verdana,sans-serif;color:var(--text);
+  }
+  h1,h2,.company-name,.tax-invoice-label,.bill-word{font-family:Georgia,'Times New Roman',serif;}
+
+  .toolbar{max-width:920px;margin:0 auto 16px;display:flex;gap:10px;flex-wrap:wrap;}
+  .toolbar button{
+    position:relative;overflow:hidden;isolation:isolate;
+    padding:11px 26px;border:none;border-radius:999px;background:var(--blue);color:#fff;
+    font-weight:600;cursor:pointer;font-size:14px;letter-spacing:.3px;
+    transition:transform .12s ease,background .12s ease,box-shadow .12s ease;
+    box-shadow:0 2px 4px rgba(0,0,0,.15);
+  }
+  .toolbar button:hover{background:var(--blue-dark);transform:translateY(-3px);box-shadow:0 6px 14px rgba(0,0,0,.25);}
+  .toolbar button:active{transform:translateY(0) scale(.96);box-shadow:0 2px 4px rgba(0,0,0,.2);}
+  .toolbar button:focus-visible{outline:3px solid #9fc4ee;outline-offset:2px;}
+  .toolbar button.secondary{background:#6b6b6b;}
+  .toolbar button.secondary:hover{background:#4d4d4d;}
+  .ripple{
+    position:absolute;border-radius:50%;background:rgba(255,255,255,.55);
+    transform:scale(0);animation:ripple-anim .5s ease-out;pointer-events:none;z-index:0;
+  }
+  @keyframes ripple-anim{to{transform:scale(2.6);opacity:0;}}
+
+  .invoice{
+    max-width:920px;margin:0 auto;background:#fff;border:1px solid var(--border);
+    border-radius:10px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,.12);
+  }
+  .head-band{
+    background:linear-gradient(135deg,var(--blue),var(--blue-dark));color:#fff;
+    padding:16px 22px;position:relative;
+  }
+  .head-band .gstin{font-size:12px;font-weight:600;letter-spacing:.4px;}
+  .head-band .phones{position:absolute;top:14px;right:20px;font-size:12px;text-align:right;opacity:.95;}
+  .head-band .phones div[contenteditable]:hover{background:rgba(255,255,255,.12);border-radius:4px;}
+  .head-band .tax-invoice-label{
+    text-align:center;font-size:28px;font-weight:bold;letter-spacing:3px;margin-top:2px;
+    transition:letter-spacing .35s ease,text-shadow .35s ease;
+    animation:heading-in .6s ease-out;
+  }
+  .head-band .tax-invoice-label:hover{letter-spacing:6px;text-shadow:0 0 10px rgba(255,255,255,.5);}
+  .head-band .tax-invoice-label .bill-word{
+    display:block;font-size:13px;font-weight:normal;letter-spacing:3px;margin-top:4px;opacity:.9;
+    font-variant:small-caps;
+  }
+  @keyframes heading-in{
+    from{opacity:0;transform:translateY(-8px);letter-spacing:8px;}
+    to{opacity:1;transform:translateY(0);letter-spacing:3px;}
+  }
+
+  .company-row{
+    background:var(--beige);padding:16px 10px 8px;text-align:center;
+    display:flex;align-items:center;justify-content:center;gap:16px;
+  }
+  .company-logo{
+    height:72px;width:72px;object-fit:cover;border-radius:50%;
+    border:2px solid var(--blue);box-shadow:0 2px 6px rgba(0,0,0,.25);
+    transition:transform .25s ease;
+  }
+  .company-logo:hover{transform:scale(1.08) rotate(2deg);}
+  .company-name{
+    font-family:'Palatino Linotype','Book Antiqua',Georgia,serif;
+    font-size:36px;font-weight:bold;color:var(--blue-dark);display:inline-block;
+    border-bottom:3px solid var(--blue);padding-bottom:6px;letter-spacing:1px;
+    text-shadow:0 1px 0 rgba(255,255,255,.6);
+    transition:background .15s,letter-spacing .35s ease,text-shadow .35s ease,color .35s ease;
+    border-radius:4px;padding-left:8px;padding-right:8px;
+  }
+  .company-name:hover{letter-spacing:4px;color:var(--blue);text-shadow:0 2px 6px rgba(29,77,120,.25);}
+  [contenteditable]{cursor:text;}
+  [contenteditable]:hover{background:#fffdf5;}
+  [contenteditable]:focus{outline:2px dashed var(--blue);background:#fffde7;}
+  .company-sub{text-align:center;font-size:13px;padding:3px 20px;color:#444;background:var(--beige);}
+  .company-sub:last-of-type{padding-bottom:14px;}
+
+  .meta-row{display:flex;border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+  .meta-row > div{flex:1;padding:14px 20px;font-size:13px;line-height:1.9;background:#fff;}
+  .meta-row > div:first-child{border-right:1px solid var(--border);background:var(--blue-light);}
+  .meta-row label{font-weight:700;display:inline-block;min-width:95px;color:var(--blue-dark);}
+  .meta-row input, .meta-row textarea{
+    border:none;border-bottom:1px solid #bbb;font-size:13px;font-family:inherit;
+    width:62%;background:transparent;padding:2px 0;transition:border-color .15s;
+  }
+  .meta-row input:focus, .meta-row textarea:focus{border-color:var(--blue);outline:none;}
+  .meta-row textarea{width:92%;resize:none;height:44px;display:block;margin-top:4px;}
+
+  table.items{width:100%;border-collapse:collapse;font-size:13px;}
+  table.items th{
+    background:var(--blue);color:#fff;padding:10px 8px;font-weight:600;letter-spacing:.3px;
+  }
+  table.items td{border:1px solid var(--border);padding:8px;text-align:center;}
+  table.items tbody tr{transition:background .12s;}
+  table.items tbody tr:nth-child(even){background:#fafafa;}
+  table.items tbody tr:hover{background:var(--blue-light);}
+  table.items td.name{text-align:left;}
+  table.items input{
+    width:100%;border:none;text-align:center;font-size:13px;background:transparent;
+    padding:4px;border-radius:4px;transition:background .12s;
+  }
+  table.items input:hover{background:#fff;}
+  table.items input:focus{background:#fffde7;outline:1px solid var(--blue);}
+  table.items td.name input{text-align:left;}
+  .row-actions{width:34px;}
+  .row-actions button{
+    border:none;background:#c0392b;color:#fff;border-radius:999px;cursor:pointer;font-size:12px;
+    width:24px;height:24px;padding:0;transition:background .12s,transform .12s;
+  }
+  .row-actions button:hover{background:#992d22;transform:scale(1.12);}
+  .row-actions button:active{transform:scale(.9);}
+  .add-row{padding:10px;text-align:left;background:#fafafa;}
+  .add-row button{
+    position:relative;overflow:hidden;
+    border:1.5px dashed var(--blue);color:var(--blue);background:#fff;padding:7px 18px;
+    cursor:pointer;border-radius:999px;font-size:13px;font-weight:600;transition:all .15s;
+  }
+  .add-row button:hover{background:var(--blue);color:#fff;border-style:solid;transform:translateY(-2px);box-shadow:0 4px 10px rgba(0,0,0,.15);}
+  .add-row button:active{transform:translateY(0) scale(.96);}
+
+  .totals{display:flex;border-top:1px solid var(--border);}
+  .totals .left{flex:1.3;padding:14px 20px;font-size:13px;background:var(--beige);}
+  .totals .left textarea{
+    width:100%;border:1px solid var(--border);border-radius:6px;font-family:inherit;
+    font-size:13px;padding:8px;resize:none;height:70px;background:#fffdf7;
+  }
+  .totals .right{flex:1;padding:0;font-size:13px;border-left:1px solid var(--border);}
+  .totals .right div{display:flex;justify-content:space-between;padding:8px 20px;border-bottom:1px solid #ddd;}
+  .totals .right div.grand{
+    font-weight:bold;font-size:16px;border-top:1px solid var(--border);
+    background:var(--blue);color:#fff;
+  }
+  .words-row{border-top:1px solid var(--border);padding:12px 20px;font-size:13px;font-weight:600;background:var(--blue-light);}
+  .sign-row{display:flex;border-top:1px solid var(--border);}
+  .sign-row div{flex:1;padding:34px 16px 14px;font-size:13px;text-align:center;}
+  .sign-row div:first-child{border-right:1px solid var(--border);}
+  .terms{background:var(--blue-dark);color:#f1eede;font-size:11px;padding:12px 20px;line-height:1.7;}
+
+  .history-panel{
+    max-width:920px;margin:18px auto;background:#fff;border:1px solid var(--border);
+    border-radius:10px;padding:16px;display:none;box-shadow:0 6px 20px rgba(0,0,0,.1);
+  }
+  .history-panel h3{margin-top:0;color:var(--blue-dark);font-family:Georgia,serif;}
+  .history-panel table{width:100%;border-collapse:collapse;font-size:13px;}
+  .history-panel th{background:var(--blue);color:#fff;padding:8px;}
+  .history-panel td{border:1px solid #ddd;padding:8px;text-align:center;}
+  .history-panel tr:hover td{background:var(--blue-light);}
+  .history-panel button{
+    padding:5px 12px;font-size:12px;border:none;border-radius:5px;cursor:pointer;margin:0 2px;
+    transition:opacity .12s;
+  }
+  .history-panel button:hover{opacity:.85;}
+
+  @media print{
+    body{background:#fff;padding:0;}
+    .toolbar, .history-panel, .row-actions, .add-row{display:none !important;}
+    .invoice{border:1px solid #000;max-width:100%;box-shadow:none;border-radius:0;}
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <button onclick="newBill()">New Bill</button>
+  <button onclick="saveBill()">Save Bill</button>
+  <button class="secondary" onclick="toggleHistory()">History</button>
+  <button onclick="window.print()">Print</button>
+</div>
+
+<div class="invoice" id="invoice">
+  <div class="head-band">
+    <div class="gstin">GSTIN : <span id="gstin">03BBUPD2306L1ZR</span></div>
+    <div class="phones">
+      <div contenteditable id="phone1">+91 86991-61743</div>
+      <div contenteditable id="phone2">+91 86992-25941</div>
+    </div>
+    <div class="tax-invoice-label">TAX INVOICE<span class="bill-word">BILL</span></div>
+  </div>
+
+  <div class="company-row">
+    <img src="../assets/images/site-logo.jpg" alt="Fancy Silk Store logo" class="company-logo">
+    <div class="company-name" contenteditable id="companyName">FANCY SILK STORE</div>
+  </div>
+  <div class="company-sub" contenteditable id="companyAddress">Near Moh. Tandona, Malri Gate, Nakodar - Distt. Jalandhar, Pin: 144040</div>
+  <div class="company-sub" contenteditable id="companyEmail">email@example.com</div>
+
+  <div class="meta-row">
+    <div>
+      <div><label>Bill No.:</label> <span id="billNo">1</span></div>
+      <div><label>Dated:</label> <input type="date" id="billDate"></div>
+      <div><label>State Code:</label> <span id="stateCode">03</span></div>
+      <div><label>GSTIN:</label> <span id="gstinMeta">03BBUPD2306L1ZR</span></div>
+    </div>
+    <div>
+      <div><label>Buyer Name:</label> <input type="text" id="buyerName" placeholder="Buyer / Party Name"></div>
+      <div><label>Address:</label><br><textarea id="buyerAddress" placeholder="Buyer address"></textarea></div>
+      <div><label>Phone:</label> <input type="text" id="buyerPhone" placeholder="Buyer phone number"></div>
+    </div>
+  </div>
+
+  <table class="items">
+    <thead>
+      <tr>
+        <th style="width:30px;">S.No.</th>
+        <th>Name</th>
+        <th style="width:70px;">Qty</th>
+        <th style="width:80px;">Rate</th>
+        <th style="width:60px;">CGST %</th>
+        <th style="width:60px;">SGST %</th>
+        <th style="width:100px;">Amount</th>
+        <th class="row-actions"></th>
+      </tr>
+    </thead>
+    <tbody id="itemsBody"></tbody>
+  </table>
+  <div class="add-row"><button onclick="addRow()">+ Add Item</button></div>
+
+  <div class="totals">
+    <div class="left">
+      <div style="font-weight:700;color:var(--blue-dark);margin-bottom:6px;">Notes</div>
+      <textarea id="notes" placeholder="Any remarks for this bill..."></textarea>
+      <div style="margin-top:8px;font-size:12px;"><b>Total Items:</b> <span id="totalItems">0</span> &nbsp; <b>Total Qty:</b> <span id="totalQty">0</span></div>
+    </div>
+    <div class="right">
+      <div><span>Taxable Amount</span><span id="taxable">0.00</span></div>
+      <div><span>CGST</span><span id="cgstAmt">0.00</span></div>
+      <div><span>SGST</span><span id="sgstAmt">0.00</span></div>
+      <div><span>Round Off</span><span id="roundOff">0.00</span></div>
+      <div class="grand"><span>Grand Total</span><span id="grandTotal">0.00</span></div>
+    </div>
+  </div>
+
+  <div class="words-row">Amount in words: <span id="amountWords">Rupees Zero Only</span></div>
+
+  <div class="sign-row">
+    <div>Customer's Signature</div>
+    <div>For <span id="signCompany">FANCY SILK STORE</span><br><br>Auth. Signatory</div>
+  </div>
+
+  <div class="terms">
+    Terms &amp; Conditions:<br>
+    1. All disputes subject to local jurisdiction only. &nbsp; 2. No return without bill number.<br>
+    3. Interest @ 24% p.a. will be charged if the bill is not paid within 7 days.<br>
+    4. Our responsibility ceases as soon as goods are delivered to the carriers.
+  </div>
+</div>
+
+<div class="history-panel" id="historyPanel">
+  <h3>Bill History</h3>
+  <table id="historyTable">
+    <thead><tr><th>Bill No.</th><th>Date</th><th>Buyer</th><th>Grand Total</th><th>Actions</th></tr></thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<script>
+const CGST_RATE = 2.5;
+const SGST_RATE = 2.5;
+const STORAGE_KEY = 'billing_history_v1';
+const COUNTER_KEY = 'billing_counter_v1';
+
+function todayISO(){
+  const d = new Date();
+  const tz = d.getTimezoneOffset()*60000;
+  return new Date(d - tz).toISOString().slice(0,10);
+}
+
+function getCounter(){
+  return parseInt(localStorage.getItem(COUNTER_KEY) || '0', 10);
+}
+function setCounter(v){
+  localStorage.setItem(COUNTER_KEY, String(v));
+}
+
+function addRow(data){
+  const tbody = document.getElementById('itemsBody');
+  const tr = document.createElement('tr');
+  const sno = tbody.children.length + 1;
+  tr.innerHTML = `
+    <td class="sno">${sno}</td>
+    <td class="name"><input type="text" class="f-name" value="${data?data.name:''}" placeholder="Item name"></td>
+    <td><input type="number" class="f-qty" value="${data?data.qty:''}" min="0" oninput="recalc()"></td>
+    <td><input type="number" class="f-rate" value="${data?data.rate:''}" min="0" oninput="recalc()"></td>
+    <td><input type="number" class="f-cgst" value="${data?data.cgst:CGST_RATE}" readonly></td>
+    <td><input type="number" class="f-sgst" value="${data?data.sgst:SGST_RATE}" readonly></td>
+    <td><span class="f-amount">0.00</span></td>
+    <td class="row-actions"><button onclick="removeRow(this)">X</button></td>
+  `;
+  tbody.appendChild(tr);
+  recalc();
+}
+
+function removeRow(btn){
+  btn.closest('tr').remove();
+  renumber();
+  recalc();
+}
+
+function renumber(){
+  document.querySelectorAll('#itemsBody tr').forEach((tr,i)=>{
+    tr.querySelector('.sno').textContent = i+1;
+  });
+}
+
+function numToWords(num){
+  const a = ['','One','Two','Three','Four','Five','Six','Seven','Eight','Nine','Ten','Eleven','Twelve','Thirteen','Fourteen','Fifteen','Sixteen','Seventeen','Eighteen','Nineteen'];
+  const b = ['','','Twenty','Thirty','Forty','Fifty','Sixty','Seventy','Eighty','Ninety'];
+  function two(n){
+    if(n<20) return a[n];
+    return b[Math.floor(n/10)] + (n%10? ' '+a[n%10] : '');
+  }
+  function three(n){
+    if(n>99) return a[Math.floor(n/100)] + ' Hundred' + (n%100? ' ' + two(n%100) : '');
+    return two(n);
+  }
+  if(num===0) return 'Zero';
+  let str='';
+  const crore = Math.floor(num/10000000); num %= 10000000;
+  const lakh = Math.floor(num/100000); num %= 100000;
+  const thousand = Math.floor(num/1000); num %= 1000;
+  const rest = num;
+  if(crore) str += three(crore) + ' Crore ';
+  if(lakh) str += three(lakh) + ' Lakh ';
+  if(thousand) str += three(thousand) + ' Thousand ';
+  if(rest) str += three(rest);
+  return str.trim();
+}
+
+function recalc(){
+  let taxable = 0, totalQty = 0, totalItems = 0;
+  document.querySelectorAll('#itemsBody tr').forEach(tr=>{
+    const qty = parseFloat(tr.querySelector('.f-qty').value) || 0;
+    const rate = parseFloat(tr.querySelector('.f-rate').value) || 0;
+    const amount = qty*rate;
+    tr.querySelector('.f-amount').textContent = amount.toFixed(2);
+    taxable += amount;
+    if(tr.querySelector('.f-name').value.trim()) totalItems++;
+    totalQty += qty;
+  });
+  const cgst = taxable * CGST_RATE/100;
+  const sgst = taxable * SGST_RATE/100;
+  const rawTotal = taxable + cgst + sgst;
+  const grand = Math.round(rawTotal);
+  const roundOff = grand - rawTotal;
+
+  document.getElementById('taxable').textContent = taxable.toFixed(2);
+  document.getElementById('cgstAmt').textContent = cgst.toFixed(2);
+  document.getElementById('sgstAmt').textContent = sgst.toFixed(2);
+  document.getElementById('roundOff').textContent = roundOff.toFixed(2);
+  document.getElementById('grandTotal').textContent = grand.toFixed(2);
+  document.getElementById('amountWords').textContent = 'Rupees ' + numToWords(grand) + ' Only';
+  document.getElementById('totalItems').textContent = totalItems;
+  document.getElementById('totalQty').textContent = totalQty;
+}
+
+function newBill(){
+  const next = getCounter() + 1;
+  document.getElementById('billNo').textContent = next;
+  document.getElementById('billDate').value = todayISO();
+  document.getElementById('buyerName').value = '';
+  document.getElementById('buyerAddress').value = '';
+  document.getElementById('buyerPhone').value = '';
+  document.getElementById('notes').value = '';
+  document.getElementById('itemsBody').innerHTML = '';
+  addRow();
+  recalc();
+}
+
+function collectBillData(){
+  const items = [...document.querySelectorAll('#itemsBody tr')].map(tr=>({
+    name: tr.querySelector('.f-name').value,
+    qty: tr.querySelector('.f-qty').value,
+    rate: tr.querySelector('.f-rate').value,
+    cgst: tr.querySelector('.f-cgst').value,
+    sgst: tr.querySelector('.f-sgst').value
+  }));
+  return {
+    billNo: document.getElementById('billNo').textContent,
+    date: document.getElementById('billDate').value,
+    buyerName: document.getElementById('buyerName').value,
+    buyerAddress: document.getElementById('buyerAddress').value,
+    buyerPhone: document.getElementById('buyerPhone').value,
+    notes: document.getElementById('notes').value,
+    items,
+    grandTotal: document.getElementById('grandTotal').textContent
+  };
+}
+
+function saveBill(){
+  const data = collectBillData();
+  if(!data.items.length || data.items.every(i=>!i.name && !i.qty)){
+    alert('Add at least one item before saving.');
+    return;
+  }
+  const history = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  const existingIdx = history.findIndex(h=>h.billNo === data.billNo);
+  if(existingIdx >= 0){
+    history[existingIdx] = data;
+  } else {
+    history.push(data);
+    setCounter(parseInt(data.billNo,10));
+  }
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+  renderHistory();
+  alert('Bill No. ' + data.billNo + ' saved.');
+}
+
+function loadBill(billNo){
+  const history = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  const data = history.find(h=>h.billNo === billNo);
+  if(!data) return;
+  document.getElementById('billNo').textContent = data.billNo;
+  document.getElementById('billDate').value = data.date;
+  document.getElementById('buyerName').value = data.buyerName;
+  document.getElementById('buyerAddress').value = data.buyerAddress;
+  document.getElementById('buyerPhone').value = data.buyerPhone;
+  document.getElementById('notes').value = data.notes || '';
+  document.getElementById('itemsBody').innerHTML = '';
+  data.items.forEach(it=>addRow(it));
+  recalc();
+  toggleHistory();
+}
+
+function deleteBill(billNo){
+  if(!confirm('Delete Bill No. ' + billNo + '?')) return;
+  let history = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  history = history.filter(h=>h.billNo !== billNo);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+  renderHistory();
+}
+
+function renderHistory(){
+  const history = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  const tbody = document.querySelector('#historyTable tbody');
+  tbody.innerHTML = '';
+  history.slice().reverse().forEach(h=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${h.billNo}</td><td>${h.date}</td><td>${h.buyerName||''}</td><td>${h.grandTotal}</td>
+      <td>
+        <button style="background:#2c7f4d;color:#fff;" onclick="loadBill('${h.billNo}')">Open</button>
+        <button style="background:#c0392b;color:#fff;" onclick="deleteBill('${h.billNo}')">Delete</button>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function toggleHistory(){
+  const p = document.getElementById('historyPanel');
+  p.style.display = p.style.display === 'block' ? 'none' : 'block';
+  if(p.style.display === 'block') renderHistory();
+}
+
+document.getElementById('companyName').addEventListener('input', ()=>{
+  document.getElementById('signCompany').textContent = document.getElementById('companyName').textContent;
+});
+
+function spawnRipple(e){
+  const btn = e.currentTarget;
+  const rect = btn.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height);
+  const ripple = document.createElement('span');
+  ripple.className = 'ripple';
+  ripple.style.width = ripple.style.height = size + 'px';
+  ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
+  ripple.style.top = (e.clientY - rect.top - size/2) + 'px';
+  btn.appendChild(ripple);
+  ripple.addEventListener('animationend', ()=>ripple.remove());
+}
+document.querySelectorAll('.toolbar button').forEach(btn=>btn.addEventListener('click', spawnRipple));
+
+newBill();
+</script>
+</body>
+</html>
