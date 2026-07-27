@@ -45,6 +45,9 @@ const PRODUCTS = [
   { id: 37, name: "Beige Floral Embroidered Dupatta Suit", category: "Designer Suit", price: 9300, fabric: "Georgette with Floral Embroidery", image: "DavJT_JsNsN_mid.jpg" },
   { id: 38, name: "Olive & Gold Embroidered Suit Pair", category: "Punjabi Suit", price: 11500, fabric: "Silk with Bead & Tassel Work", image: "cover_38.jpg" },
   { id: 39, name: "Mustard Embroidered Suit (Size 40/42)", category: "Punjabi Suit", price: 2650, fabric: "Georgette with Sequin Embroidery", image: "DaxeLltMtf4_mid.jpg" },
+  { id: 40, name: "Rose Gold Sequined Sharara Co-ord Set", category: "Designer Suit", price: 13500, fabric: "Sequined Satin with Beaded Border", image: "DbPgNWeRkRb_mid.jpg" },
+  { id: 41, name: "Sage & Blush Floral Printed Suit with Potli Bag", category: "Punjabi Suit", price: 8800, fabric: "Digital Floral Print with Zari Border", image: "DbQY6ybsRDQ_mid.jpg" },
+  { id: 42, name: "Rani Pink Heavy Embroidered Anarkali Suit", category: "Bridal Wear", price: 15900, fabric: "Silk with Gota & Mirror Embroidery", image: "DbQVoQvsGAo_mid.jpg" },
 ];
 
 // Reel images — scraped Instagram photos not used as catalog cover shots

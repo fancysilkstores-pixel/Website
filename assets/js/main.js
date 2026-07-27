@@ -150,7 +150,7 @@ const REEL_VIDEO_SHORTCODES = new Set([
   "DbIzVtNpVzX","DbJK0qkT9oW","DbJK8KJzNqH","DbJKmv6zWRr","DbJLL9RTDc_",
   "DbLKydbMq7h","DbLQo4zMGkR","DbLdr6IzC4t","DbLgguXzEh5","DbN0ZdNJidf",
   "DbN1tHZsVl_","DbN78EBMEkE","DbNOc0jxWoa","DbOEUCPsTpm","DbOFYhksc0_",
-  "DbOKm0WTjbk","DbOLB2PTUJI",
+  "DbOKm0WTjbk","DbOLB2PTUJI","DbPgNWeRkRb","DbQY6ybsRDQ","DbQVoQvsGAo",
 ]);
 function reelShortCodeFromFile(file){
   return file.replace(/\.(jpg|jpeg|png)$/i, '').replace(/_(mid|retry|alt)$/, '');
