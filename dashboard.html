@@ -305,6 +305,10 @@ function init(){
 }
 
 init();
+
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('bill-sw.js').catch(()=>{});
+}
 </script>
 </body>
 </html>

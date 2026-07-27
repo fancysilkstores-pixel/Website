@@ -54,6 +54,17 @@
   .btn-preview{background:#3a6ea5;}
   .btn-pdf{background:#2c7f4d;}
   .empty-state{padding:40px;text-align:center;color:#777;font-size:15px;}
+  .search-row{max-width:1000px;margin:0 auto 14px;}
+  .search-row input{
+    width:100%;padding:12px 16px;border:1px solid var(--border);border-radius:999px;
+    font-size:14px;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.08);
+  }
+  .search-row input:focus{outline:2px solid var(--blue);outline-offset:1px;}
+  .offline-banner{
+    max-width:1000px;margin:0 auto 14px;padding:10px 16px;border-radius:8px;
+    background:#fff3cd;color:#7a5b00;font-size:13px;font-weight:600;display:none;
+  }
+  .offline-banner.show{display:block;}
 
   /* Modal preview */
   .modal-backdrop{
@@ -130,6 +141,12 @@
   </div>
 </div>
 
+<div class="offline-banner" id="offlineBanner">You're offline — showing bills saved on this device.</div>
+
+<div class="search-row">
+  <input type="text" id="searchInput" placeholder="Search by bill no., buyer name or date...">
+</div>
+
 <div class="panel">
   <table>
     <thead>
@@ -194,11 +211,21 @@ function computeTotals(items){
 }
 
 function renderList(){
-  const history = getHistory();
+  const query = (document.getElementById('searchInput').value || '').trim().toLowerCase();
+  const history = getHistory().filter(h=>{
+    if(!query) return true;
+    return String(h.billNo||'').toLowerCase().includes(query)
+      || String(h.buyerName||'').toLowerCase().includes(query)
+      || String(h.date||'').toLowerCase().includes(query);
+  });
   const tbody = document.getElementById('historyBody');
   const empty = document.getElementById('emptyState');
   tbody.innerHTML = '';
-  if(!history.length){ empty.style.display='block'; return; }
+  if(!history.length){
+    empty.style.display='block';
+    empty.textContent = query ? 'No bills match your search.' : 'No bills saved yet. Create one from "New Bill".';
+    return;
+  }
   empty.style.display='none';
   history.slice().reverse().forEach(h=>{
     const tr = document.createElement('tr');
@@ -329,6 +356,19 @@ function closeModal(){
 document.getElementById('modalBackdrop').addEventListener('click', (e)=>{
   if(e.target.id === 'modalBackdrop') closeModal();
 });
+
+document.getElementById('searchInput').addEventListener('input', renderList);
+
+function updateOfflineBanner(){
+  document.getElementById('offlineBanner').classList.toggle('show', !navigator.onLine);
+}
+window.addEventListener('online', updateOfflineBanner);
+window.addEventListener('offline', updateOfflineBanner);
+updateOfflineBanner();
+
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('bill-sw.js').catch(()=>{});
+}
 
 renderList();
 </script>
