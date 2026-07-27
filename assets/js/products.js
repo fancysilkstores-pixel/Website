@@ -48,13 +48,13 @@ const PRODUCTS = [
   { id: 40, name: "Rose Gold Sequined Sharara Co-ord Set", category: "Designer Suit", price: 13500, fabric: "Sequined Satin with Beaded Border", image: "DbPgNWeRkRb_mid.jpg" },
   { id: 41, name: "Sage & Blush Floral Printed Suit with Potli Bag", category: "Punjabi Suit", price: 8800, fabric: "Digital Floral Print with Zari Border", image: "DbQY6ybsRDQ_mid.jpg" },
   { id: 42, name: "Rani Pink Heavy Embroidered Anarkali Suit", category: "Bridal Wear", price: 15900, fabric: "Silk with Gota & Mirror Embroidery", image: "DbQVoQvsGAo_mid.jpg" },
+  { id: 43, name: "Dusty Mauve Embroidered Peplum Sharara Suit", category: "Bridal Wear", price: 11200, fabric: "Net with Multicolor Embroidery", image: "DbOLB2PTUJI_mid.jpg" },
+  { id: 44, name: "Rust Floral Peacock Embroidered Peplum Suit", category: "Bridal Wear", price: 17650, fabric: "Net with Zardozi & Sequin Embroidery", image: "DbOKm0WTjbk_mid.jpg" },
+  { id: 45, name: "Beige Blush Embellished Sharara Suit", category: "Bridal Wear", price: 9430, fabric: "Net with Pearl & Sequin Embroidery", image: "DbOFYhksc0__mid.jpg" },
 ];
 
 // Reel images — scraped Instagram photos not used as catalog cover shots
 const REEL_IMAGES = [
-  "DbOLB2PTUJI_mid.jpg",
-  "DbOKm0WTjbk_mid.jpg",
-  "DbOFYhksc0__mid.jpg",
   "DbOEUCPsTpm_mid.jpg",
   "DbN78EBMEkE_mid.jpg",
   "DbN1tHZsVl__mid.jpg",
