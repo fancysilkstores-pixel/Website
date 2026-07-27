@@ -1,9 +1,18 @@
-const CACHE_NAME = 'fss-billing-v1';
+const CACHE_NAME = 'fss-billing-v2';
 const CORE_ASSETS = [
   'bill.html',
   'bill-history.html',
   'dashboard.html',
-  'assets/images/site-logo.jpg'
+  'assets/images/site-logo.jpg',
+  'assets/js/html2canvas.min.js',
+  'assets/js/jspdf.umd.min.js',
+  'assets/js/chart.umd.min.js',
+  'assets/fonts/poppins.css',
+  'assets/fonts/poppins-400.woff2',
+  'assets/fonts/poppins-500.woff2',
+  'assets/fonts/poppins-600.woff2',
+  'assets/fonts/poppins-700.woff2',
+  'assets/fonts/poppins-800.woff2'
 ];
 
 self.addEventListener('install', (event) => {
